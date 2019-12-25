@@ -6,12 +6,15 @@ SQLFLAGS= `mysql_config --cflags --libs`
 
 # Comment this line to disable address check on login,
 # if you use the auto exchange feature...
-CFLAGS += -DNO_EXCHANGE
+# CFLAGS += -DNO_EXCHANGE 
+
+# NO_MYSQL flag used to operate in solo mode without DB installed
+CFLAGS += -DNO_MYSQL
 
 #CFLAGS=-c -O2 -I /usr/include/mysql
 LDFLAGS=-O2 `mysql_config --libs`
 
-LDLIBS=iniparser/libiniparser.a algos/libalgos.a sha3/libhash.a -lpthread -lgmp -lm -lstdc++
+LDLIBS=iniparser/libiniparser.a algos/libalgos.a sha3/libhash.a -lsodium -lpthread -lgmp -lm -lstdc++
 LDLIBS+=-lmysqlclient
 
 SOURCES=stratum.cpp db.cpp coind.cpp coind_aux.cpp coind_template.cpp coind_submit.cpp util.cpp list.cpp \
