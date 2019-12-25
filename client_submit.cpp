@@ -728,7 +728,7 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
 
 	if (g_debuglog_hash) {
 		debuglog("submit %s (uid %d) %d, ntime = %s, nonce = %s, sol = %s\n", client->sock->ip, client->userid,
-			jobid, ntime, nonce, equi_solution);
+			jobid, ntime, nonce, "..." /*equi_solution*/);
 	}
 
 	YAAMP_JOB *job = (YAAMP_JOB *)object_find(&g_list_job, jobid, true);
