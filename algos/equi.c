@@ -70,7 +70,13 @@ void digestInit(crypto_generichash_blake2b_state *S, const int n, const int k) {
   uint32_t le_N = htole32(n);
   uint32_t le_K = htole32(k);
   unsigned char personalization[crypto_generichash_blake2b_PERSONALBYTES] = {};
-  memcpy(personalization, "EquivPoW", 8);
+  /*
+    ZCash (ZEC) - ZcashPoW
+    Komodo (KMD) - ZcashPoW
+    Komodo (NK assetchains) - NandKPoW
+    Vidulum (VDL) - EquivPoW
+  */
+  memcpy(personalization, "ZcashPoW", 8);
   memcpy(personalization + 8,  &le_N, 4);
   memcpy(personalization + 12, &le_K, 4);
   crypto_generichash_blake2b_init_salt_personal(S,
@@ -140,8 +146,8 @@ static void generateHash(crypto_generichash_blake2b_state *S, const uint32_t g, 
 // hdr -> header including nonce (140 bytes)
 // soln -> equihash solution (excluding 3 bytes with size, so 400 bytes length)
   bool verifyEH(const char *hdr, const char *soln) {
-  const int n = 192;
-  const int k = 7;
+  const int n = 200;
+  const int k = 9;
   const int collisionBitLength  = n / (k + 1);
   const int collisionByteLength = (collisionBitLength + 7) / 8;
   const int hashLength = (k + 1) * collisionByteLength;
