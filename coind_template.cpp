@@ -513,9 +513,12 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
             strcpy(templ->mr_hex,hex_reversed.c_str());
         } else 
         {
+            // TODO: don't sure about a case with only one coinbase in blocktemplate,
+            // without other txes
             std::string hex(p);
-            //for (std::string::iterator it=hex.begin(); it != hex.end(); it += 2) std::swap(it[0], it[1]);
-            //std::string hex_reversed(hex.rbegin(), hex.rend());
+            std::cerr << "conbase hash: " << p << std::endl;
+            for (std::string::iterator it=hex.begin(); it != hex.end(); it += 2) std::swap(it[0], it[1]);
+            std::string hex_reversed(hex.rbegin(), hex.rend());
             strcpy(templ->mr_hex,hex.c_str());
         }
 

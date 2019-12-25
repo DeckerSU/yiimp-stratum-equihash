@@ -50,8 +50,11 @@
 
 #include "common.h"
 
+void sha256_hash(const char *input, char *output, unsigned int len);
 void equi_hash(const char* input, char* output, uint32_t len)
 {
+        
+        /*
         uint32_t hash0[32];
         uint32_t hash1[32];
 
@@ -64,6 +67,16 @@ void equi_hash(const char* input, char* output, uint32_t len)
         sph_sha256_close(&ctx_sha256, hash1);
 
         memcpy(output, hash1, 32);
+        */
+   
+       // https://forum.zcashcommunity.com/t/equihash-difficulty/838/3
+       // SHA256(SHA256(Data | Nonce | Solution))
+
+       unsigned char output1[32];
+
+       sha256_hash(input, output1, len);
+       sha256_hash(output1, output, 32);
+
 }
 
 void digestInit(crypto_generichash_blake2b_state *S, const int n, const int k) {

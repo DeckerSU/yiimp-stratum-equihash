@@ -63,7 +63,7 @@ void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE
     std::cerr << "------------------------" << std::endl;
     std::cerr << "nonce1 = " << nonce1 << std::endl;
     std::cerr << "nonce2 = " << nonce2 << std::endl;
-    std::cerr << "ntime = " << ntime << std::endl;
+    std::cerr << "ntime = " << ntime << " (" << templ->ntime << ")" << std::endl;
     std::cerr << "nonce = " << nonce << std::endl;
     //std::cerr << "equi_solution = " << equi_solution << std::endl;
 
@@ -134,6 +134,7 @@ void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE
         char rev_nbits[32] = {0};
         string_be(templ->version,rev_version);
         string_be(ntime,rev_ntime);
+        //string_be(templ->ntime,rev_ntime);
         string_be(templ->nbits,rev_nbits);
 
         /*
@@ -149,7 +150,10 @@ void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE
 
         std::cerr << "[!] nonceN = " << nonce1 << nonce << std::endl;
         //std::cerr << "[!] nonceR = " << rev_nonce << rev_nonce1 << std::endl;
-        
+        /*
+        sprintf(submitvalues->header, "%s%s%s%s%s%s%s%s%s", rev_version, templ->prevhash_be, submitvalues->merkleroot_be,
+            templ->extradata_be, rev_ntime, rev_nbits, nonce1, nonce, equi_solution);
+        */
         sprintf(submitvalues->header, "%s%s%s%s%s%s%s%s%s", rev_version, templ->prevhash_be, submitvalues->merkleroot_be,
             templ->extradata_be, rev_ntime, rev_nbits, nonce1, nonce, equi_solution);
 
@@ -182,6 +186,12 @@ void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE
 	hexlify(submitvalues->hash_hex, submitvalues->hash_bin, 32);
 	string_be(submitvalues->hash_hex, submitvalues->hash_be);
     std::cerr << "  blockhash: " << submitvalues->hash_be << std::endl;
+
+    // hdr -> header including nonce (140 bytes)
+    // soln -> equihash solution (excluding 3 bytes with size, so 400 bytes length)
+    // bool verifyEH(const char *hdr, const char *soln) 
+
+
 }
 /////////////////////////////////////////////
 
@@ -378,6 +388,7 @@ static void client_do_submit(YAAMP_CLIENT *client, YAAMP_JOB *job, YAAMP_JOB_VAL
 				snprintf(block_hex, block_size, "%s", hex);
 		}
 
+        std::cerr << "Block hex: " << block_hex << std::endl;
 		bool b = coind_submit(coind, block_hex);
 		if(b)
 		{
@@ -830,7 +841,7 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
 	// minimum hash diff begins with 0000, for all...
 	uint8_t pfx = submitvalues.hash_bin[30] | submitvalues.hash_bin[31];
 	
-    if(0 && pfx) {
+       if(0 && pfx) {
 		if (g_debuglog_hash) {
 			debuglog("Possible %s error, hash starts with %02x%02x%02x%02x\n", g_current_algo->name,
 				(int) submitvalues.hash_bin[31], (int) submitvalues.hash_bin[30],
@@ -877,7 +888,7 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
 
 	if (g_debuglog_hash) {
 		// only log a few...
-		if (share_diff > (client->difficulty_actual * 16))
+		// if (share_diff > (client->difficulty_actual * 16))
 			debuglog("submit %s (uid %d) %d, %s, %s, %s, %.3f/%.3f\n", client->sock->ip, client->userid,
 				jobid, extranonce2, ntime, nonce, share_diff, client->difficulty_actual);
 	}
