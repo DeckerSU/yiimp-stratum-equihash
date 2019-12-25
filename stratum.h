@@ -49,6 +49,7 @@ typedef void (*YAAMP_HASH_FUNCTION)(const char *, char *, uint32_t);
 #define YAAMP_SMALLBUFSIZE		(32*1024)
 
 #define YAAMP_NONCE_SIZE		4
+#define YAAMP_EQUI_NONCE_SIZE	32
 #define YAAMP_EXTRANONCE2_SIZE	4
 
 #define YAAMP_HASHLEN_STR		65

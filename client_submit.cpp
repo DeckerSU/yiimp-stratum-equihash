@@ -572,12 +572,23 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
     for (int i = 0; i < json_params->u.array.length; i++) {
         std::cerr << "[" << i << "] " << json_params->u.array.values[i]->u.string.ptr << std::endl;
     }
+    /*
+        [0] RTcq51jkXENgvmpo4tzRtRuTxMbdrdwsJY - address (wallet)
+        [1] 1 -jobid (?)
+        [2] 0d6e035e
+        [3] 0000000000000000d7b3000002000000000000000000000000000000
+        [4] equihash solution
+
+        pool->user, jobid, timehex, noncestr, solhex
+    */
 
 	char extranonce2[32] = { 0 };
 	char extra[160] = { 0 };
 	char nonce[80] = { 0 };
-	char ntime[32] = { 0 };
+	char ntime[33] = { 0 };
 	char vote[8] = { 0 };
+    char equi_solution[1344*2 + 64] = { 0 }; // 1344*2 + 64 as solhex field in ccminer
+                                             // but should be 1344*2 + 3*2 (fd4005 bytes = 0xfd, 0x0540)
 
 	if (strlen(json_params->u.array.values[1]->u.string.ptr) > 32) {
 		clientlog(client, "bad json, wrong jobid len");
@@ -586,29 +597,22 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
 	}
 	int jobid = htoi(json_params->u.array.values[1]->u.string.ptr);
 
-	strncpy(extranonce2, json_params->u.array.values[2]->u.string.ptr, 31);
-	strncpy(ntime, json_params->u.array.values[3]->u.string.ptr, 31);
-	strncpy(nonce, json_params->u.array.values[4]->u.string.ptr, 31);
+    // 0 - ?, 1 - xnonce1 (extranonce1) [string], 2 - xn2_size
+    // ccminer: xn1_size = (int)strlen(xnonce1) / 2, xn2_size = 32 - xn1_size; // xn1_size = 4, xn2_size = 28
 
-	string_lower(extranonce2);
+	//strncpy(extranonce2, json_params->u.array.values[2]->u.string.ptr, 31);
+	strncpy(ntime, json_params->u.array.values[2]->u.string.ptr, 32);
+	strncpy(nonce, json_params->u.array.values[3]->u.string.ptr, 32);
+    strncpy(equi_solution, json_params->u.array.values[4]->u.string.ptr, 1344*2 + 3*2 );
+
+	//string_lower(extranonce2);
 	string_lower(ntime);
 	string_lower(nonce);
-
-	if (json_params->u.array.length == 6) {
-		if (strstr(g_stratum_algo, "phi")) {
-			// lux optional field, smart contral root hashes (not mandatory on shares submit)
-			strncpy(extra, json_params->u.array.values[5]->u.string.ptr, 128);
-			string_lower(extra);
-		} else {
-			// heavycoin vote
-			strncpy(vote, json_params->u.array.values[5]->u.string.ptr, 7);
-			string_lower(vote);
-		}
-	}
+    string_lower(equi_solution);
 
 	if (g_debuglog_hash) {
-		debuglog("submit %s (uid %d) %d, %s, t=%s, n=%s, extra=%s\n", client->sock->ip, client->userid,
-			jobid, extranonce2, ntime, nonce, extra);
+		debuglog("submit %s (uid %d) %d, ntime = %s, nonce = %s, sol = %s\n", client->sock->ip, client->userid,
+			jobid, ntime, nonce, equi_solution);
 	}
 
 	YAAMP_JOB *job = (YAAMP_JOB *)object_find(&g_list_job, jobid, true);
@@ -630,7 +634,9 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
 
 	YAAMP_JOB_TEMPLATE *templ = job->templ;
 
-	if(strlen(nonce) != YAAMP_NONCE_SIZE*2 || !ishexa(nonce, YAAMP_NONCE_SIZE*2)) {
+    std::cerr << strlen(nonce) << std::endl;
+
+	if(strlen(nonce) != YAAMP_EQUI_NONCE_SIZE*2 || !ishexa(nonce, YAAMP_EQUI_NONCE_SIZE*2)) {
 		client_submit_error(client, job, 20, "Invalid nonce size", extranonce2, ntime, nonce);
 		return true;
 	}
