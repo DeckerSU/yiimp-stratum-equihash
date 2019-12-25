@@ -305,7 +305,13 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 	strcpy(templ->nbits, bits ? bits : "");
 	const char *prev = json_get_string(json_result, "previousblockhash");
 	strcpy(templ->prevhash_hex, prev ? prev : "");
-	const char *flags = json_get_string(json_coinbaseaux, "flags");
+	
+	const char *flags;
+	if(!json_coinbaseaux && coind->isaux)
+		flags = json_get_string(json_coinbaseaux, "flags");
+		else
+		flags = NULL;
+
 	strcpy(templ->flags, flags ? flags : "");
 
 	// LBC Claim Tree (with wallet gbt patch)
