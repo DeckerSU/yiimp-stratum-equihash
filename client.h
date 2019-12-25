@@ -156,6 +156,7 @@ int client_send_error(YAAMP_CLIENT *client, int error, const char *string);
 bool client_ask_stats(YAAMP_CLIENT *client);
 
 bool client_submit(YAAMP_CLIENT *client, json_value *json_params);
+bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params);
 
 int client_workers_count(YAAMP_CLIENT *client);
 int client_workers_byaddress(const char *username);

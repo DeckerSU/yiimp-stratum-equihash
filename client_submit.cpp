@@ -556,3 +556,209 @@ bool client_submit(YAAMP_CLIENT *client, json_value *json_params)
 
 	return true;
 }
+
+// -------------------------------------------------------------
+
+bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
+{
+	// submit(worker_name, jobid, extranonce2, ntime, nonce):
+	if(json_params->u.array.length<5 || !valid_string_params(json_params)) {
+		debuglog("%s - %s bad message\n", client->username, client->sock->ip);
+		client->submit_bad++;
+		return false;
+	}
+
+    // debug
+    for (int i = 0; i < json_params->u.array.length; i++) {
+        std::cerr << "[" << i << "] " << json_params->u.array.values[i]->u.string.ptr << std::endl;
+    }
+
+	char extranonce2[32] = { 0 };
+	char extra[160] = { 0 };
+	char nonce[80] = { 0 };
+	char ntime[32] = { 0 };
+	char vote[8] = { 0 };
+
+	if (strlen(json_params->u.array.values[1]->u.string.ptr) > 32) {
+		clientlog(client, "bad json, wrong jobid len");
+		client->submit_bad++;
+		return false;
+	}
+	int jobid = htoi(json_params->u.array.values[1]->u.string.ptr);
+
+	strncpy(extranonce2, json_params->u.array.values[2]->u.string.ptr, 31);
+	strncpy(ntime, json_params->u.array.values[3]->u.string.ptr, 31);
+	strncpy(nonce, json_params->u.array.values[4]->u.string.ptr, 31);
+
+	string_lower(extranonce2);
+	string_lower(ntime);
+	string_lower(nonce);
+
+	if (json_params->u.array.length == 6) {
+		if (strstr(g_stratum_algo, "phi")) {
+			// lux optional field, smart contral root hashes (not mandatory on shares submit)
+			strncpy(extra, json_params->u.array.values[5]->u.string.ptr, 128);
+			string_lower(extra);
+		} else {
+			// heavycoin vote
+			strncpy(vote, json_params->u.array.values[5]->u.string.ptr, 7);
+			string_lower(vote);
+		}
+	}
+
+	if (g_debuglog_hash) {
+		debuglog("submit %s (uid %d) %d, %s, t=%s, n=%s, extra=%s\n", client->sock->ip, client->userid,
+			jobid, extranonce2, ntime, nonce, extra);
+	}
+
+	YAAMP_JOB *job = (YAAMP_JOB *)object_find(&g_list_job, jobid, true);
+	if(!job)
+	{
+		client_submit_error(client, NULL, 21, "Invalid job id", extranonce2, ntime, nonce);
+		return true;
+	}
+
+	if(job->deleted)
+	{
+		client_send_result(client, "true");
+		object_unlock(job);
+
+		return true;
+	}
+
+	bool is_decred = job->coind && !strcmp("DCR", job->coind->rpcencoding);
+
+	YAAMP_JOB_TEMPLATE *templ = job->templ;
+
+	if(strlen(nonce) != YAAMP_NONCE_SIZE*2 || !ishexa(nonce, YAAMP_NONCE_SIZE*2)) {
+		client_submit_error(client, job, 20, "Invalid nonce size", extranonce2, ntime, nonce);
+		return true;
+	}
+
+	if(strcmp(ntime, templ->ntime))
+	{
+		if (!ishexa(ntime, 8) || !ntime_valid_range(ntime)) {
+			client_submit_error(client, job, 23, "Invalid time rolling", extranonce2, ntime, nonce);
+			return true;
+		}
+		// dont allow algos permutations change over time (can lead to different speeds)
+		if (!g_allow_rolltime) {
+			client_submit_error(client, job, 23, "Invalid ntime (rolling not allowed)", extranonce2, ntime, nonce);
+			return true;
+		}
+	}
+
+	YAAMP_SHARE *share = share_find(job->id, extranonce2, ntime, nonce, client->extranonce1);
+	if(share)
+	{
+		client_submit_error(client, job, 22, "Duplicate share", extranonce2, ntime, nonce);
+		return true;
+	}
+
+	if(strlen(extranonce2) != client->extranonce2size*2)
+	{
+		client_submit_error(client, job, 24, "Invalid extranonce2 size", extranonce2, ntime, nonce);
+		return true;
+	}
+
+	// check if the submitted extranonce is valid
+	if(is_decred && client->extranonce2size > 4) {
+		char extra1_id[16], extra2_id[16];
+		int cmpoft = client->extranonce2size*2 - 8;
+		strcpy(extra1_id, &client->extranonce1[cmpoft]);
+		strcpy(extra2_id, &extranonce2[cmpoft]);
+		int extradiff = (int) strcmp(extra2_id, extra1_id);
+		int extranull = (int) !strcmp(extra2_id, "00000000");
+		if (extranull && client->extranonce2size > 8)
+			extranull = (int) !strcmp(&extranonce2[8], "00000000" "00000000");
+		if (extranull) {
+			debuglog("extranonce %s is empty!, should be %s - %s\n", extranonce2, extra1_id, client->sock->ip);
+			client_submit_error(client, job, 27, "Invalid extranonce2 suffix", extranonce2, ntime, nonce);
+			return true;
+		}
+		if (extradiff) {
+			// some ccminer pre-release doesn't fill correctly the extranonce
+			client_submit_error(client, job, 27, "Invalid extranonce2 suffix", extranonce2, ntime, nonce);
+			socket_send(client->sock, "{\"id\":null,\"method\":\"mining.set_extranonce\",\"params\":[\"%s\",%d]}\n",
+				client->extranonce1, client->extranonce2size);
+			return true;
+		}
+	}
+	else if(!ishexa(extranonce2, client->extranonce2size*2)) {
+		client_submit_error(client, job, 27, "Invalid nonce2", extranonce2, ntime, nonce);
+		return true;
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////
+
+	YAAMP_JOB_VALUES submitvalues;
+	memset(&submitvalues, 0, sizeof(submitvalues));
+
+	if(is_decred)
+		build_submit_values_decred(&submitvalues, templ, client->extranonce1, extranonce2, ntime, nonce, vote, true);
+	else
+		build_submit_values(&submitvalues, templ, client->extranonce1, extranonce2, ntime, nonce);
+
+	if (templ->height && !strcmp(g_current_algo->name,"lyra2z")) {
+		lyra2z_height = templ->height;
+	}
+
+	// minimum hash diff begins with 0000, for all...
+	uint8_t pfx = submitvalues.hash_bin[30] | submitvalues.hash_bin[31];
+	if(pfx) {
+		if (g_debuglog_hash) {
+			debuglog("Possible %s error, hash starts with %02x%02x%02x%02x\n", g_current_algo->name,
+				(int) submitvalues.hash_bin[31], (int) submitvalues.hash_bin[30],
+				(int) submitvalues.hash_bin[29], (int) submitvalues.hash_bin[28]);
+		}
+		client_submit_error(client, job, 25, "Invalid share", extranonce2, ntime, nonce);
+		return true;
+	}
+
+	uint64_t hash_int = get_hash_difficulty(submitvalues.hash_bin);
+	uint64_t user_target = diff_to_target(client->difficulty_actual);
+	uint64_t coin_target = decode_compact(templ->nbits);
+	if (templ->nbits && !coin_target) coin_target = 0xFFFF000000000000ULL;
+
+	if (g_debuglog_hash) {
+		debuglog("%016llx actual\n", hash_int);
+		debuglog("%016llx target\n", user_target);
+		debuglog("%016llx coin\n", coin_target);
+	}
+	if(hash_int > user_target && hash_int > coin_target)
+	{
+		client_submit_error(client, job, 26, "Low difficulty share", extranonce2, ntime, nonce);
+		return true;
+	}
+
+	if(job->coind)
+		client_do_submit(client, job, &submitvalues, extranonce2, ntime, nonce, vote);
+	else
+		remote_submit(client, job, &submitvalues, extranonce2, ntime, nonce);
+
+	client_send_result(client, "true");
+	client_record_difficulty(client);
+	client->submit_bad = 0;
+	client->shares++;
+	if (client->shares <= 200 && (client->shares % 50) == 0) {
+		// 4 records are enough per miner
+		if (!client_ask_stats(client)) client->stats = false;
+	}
+
+	double share_diff = diff_to_target(hash_int);
+//	if (g_current_algo->diff_multiplier != 0) {
+//		share_diff = share_diff / g_current_algo->diff_multiplier;
+//	}
+
+	if (g_debuglog_hash) {
+		// only log a few...
+		if (share_diff > (client->difficulty_actual * 16))
+			debuglog("submit %s (uid %d) %d, %s, %s, %s, %.3f/%.3f\n", client->sock->ip, client->userid,
+				jobid, extranonce2, ntime, nonce, share_diff, client->difficulty_actual);
+	}
+
+	share_add(client, job, true, extranonce2, ntime, nonce, share_diff, 0);
+	object_unlock(job);
+
+	return true;
+}

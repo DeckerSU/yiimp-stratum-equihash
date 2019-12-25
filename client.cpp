@@ -609,9 +609,12 @@ void *client_thread(void *p)
 		else if(!strcmp(method, "mining.ping"))
 			b = client_send_result(client, "\"pong\"");
 
-		else if(!strcmp(method, "mining.submit"))
-			b = client_submit(client, json_params);
-
+		else if(!strcmp(method, "mining.submit")) {
+            if (g_current_algo->name && !strcmp(g_current_algo->name,"equihash")) {
+                b = client_submit_equi(client, json_params);
+            } else
+                b = client_submit(client, json_params);
+        }
 		else if(!strcmp(method, "mining.suggest_difficulty"))
 			b = client_suggest_difficulty(client, json_params);
 
