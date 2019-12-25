@@ -444,6 +444,8 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 			templ->has_filtered_txs = true;
 		}
 	}
+    
+    std::cerr << "[1] Txes count: " << templ->txdata.size() << std::endl;
 
     // for equihash we need to insert coinbasetxn here
     if (!strcmp(g_stratum_algo, "equihash")) {
@@ -500,12 +502,22 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
             
         }
         */
-        std::string mr = merkle_with_first(txsteps, hash_be);
-        std::string hex(mr);
-        for (std::string::iterator it=hex.begin(); it != hex.end(); it += 2) std::swap(it[0], it[1]);
-        std::string hex_reversed(hex.rbegin(), hex.rend());
-        //std::cerr << hex_reversed << std::endl;
-        strcpy(templ->mr_hex,hex_reversed.c_str());
+
+        if (txsteps.size() > 0) 
+        {
+            std::string mr = merkle_with_first(txsteps, hash_be);
+            std::string hex(mr);
+            for (std::string::iterator it=hex.begin(); it != hex.end(); it += 2) std::swap(it[0], it[1]);
+            std::string hex_reversed(hex.rbegin(), hex.rend());
+            //std::cerr << hex_reversed << std::endl;
+            strcpy(templ->mr_hex,hex_reversed.c_str());
+        } else 
+        {
+            std::string hex(p);
+            //for (std::string::iterator it=hex.begin(); it != hex.end(); it += 2) std::swap(it[0], it[1]);
+            //std::string hex_reversed(hex.rbegin(), hex.rend());
+            strcpy(templ->mr_hex,hex.c_str());
+        }
 
         // standart - merkle_arr = txsteps = templ->txmerkles       - // https://github.com/slushpool/poclbm-zcash/wiki/Stratum-protocol-changes-for-ZCash
         // equishash - merkle_arr->merkleroot (including coinbase)  - // https://en.bitcoin.it/wiki/Stratum_mining_protocol#mining.notify

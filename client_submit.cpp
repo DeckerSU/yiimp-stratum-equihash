@@ -65,13 +65,14 @@ void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE
     std::cerr << "nonce2 = " << nonce2 << std::endl;
     std::cerr << "ntime = " << ntime << std::endl;
     std::cerr << "nonce = " << nonce << std::endl;
-    std::cerr << "equi_solution = " << equi_solution << std::endl;
+    //std::cerr << "equi_solution = " << equi_solution << std::endl;
 
     // let's assemble coinbase
 	// sprintf(submitvalues->coinbase, "%s%s%s%s", templ->coinb1, nonce1, nonce2, templ->coinb2);
     sprintf(submitvalues->coinbase, "%s", templ->coinbase);
 	int coinbase_len = strlen(submitvalues->coinbase);
-    std::cerr << "coinbase[" << coinbase_len << "] = " << submitvalues->coinbase << std::endl;
+    //std::cerr << "coinbase[" << coinbase_len << "] = " << submitvalues->coinbase << std::endl;
+    std::cerr << "[2] Txes count: " << templ->txdata.size() << std::endl;
 
 	unsigned char coinbase_bin[1024];
 	memset(coinbase_bin, 0, 1024);
@@ -117,17 +118,40 @@ void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE
         READWRITE(nNonce);
         READWRITE(nSolution);
 
-    */
+    */  
 
     {
-        sprintf(submitvalues->header, "%s%s%s%s%s%s00000000%s%s", templ->version, templ->prevhash_be, submitvalues->merkleroot_be,
-            templ->extradata_be, ntime, templ->nbits, nonce, equi_solution);
-        ser_string_be(submitvalues->header, submitvalues->header_be, 20);
+        
+        char rev_version[32] = {0};
+        char rev_ntime[32] = {0};
+        char rev_nbits[32] = {0};
+        string_be(templ->version,rev_version);
+        string_be(ntime,rev_ntime);
+        string_be(templ->nbits,rev_nbits);
+
+        
+        sprintf(submitvalues->header, "%s%s%s%s%s%s00000000%s%s", rev_version, templ->prevhash_be, submitvalues->merkleroot_be,
+            templ->extradata_be, rev_ntime, rev_nbits, nonce, equi_solution);
+        //std::cerr << "strlen(submitvalues->header) = " << strlen(submitvalues->header) << std::endl;
+        //ser_string_be(submitvalues->header, submitvalues->header_be, 20); // 20? 
+        
+        memset(submitvalues->header_be, 0, EQUI_HEADER_SIZE * 2 + 1);
+        strcpy(submitvalues->header_be,submitvalues->header);
+        
+        //std::cerr << "submitvalues->header    = " << submitvalues->header << std::endl;
+        //std::cerr << "submitvalues->header_be = " << submitvalues->header_be << std::endl;
+
+        
+
+        // btc header - 80 
+        // zec/kmd header - 4+32+32+32+4+4+32 = 140 
+        // zec/kmd header + sol - 4+32+32+32+4+4+32 + 1344 + 3 = 1487
+
 	}
 
 	binlify(submitvalues->header_bin, submitvalues->header_be);
 
-    std::cerr << "blockheader: " << submitvalues->header_be << std::endl;
+    // std::cerr << "blockheader: " << submitvalues->header_be << std::endl;
 
     //	printf("%s\n", submitvalues->header_be);
 	int header_len = strlen(submitvalues->header)/2;
@@ -652,7 +676,7 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
 	}
 
     // debug
-    for (int i = 0; i < json_params->u.array.length; i++) {
+    for (int i = 0; i < json_params->u.array.length - 1; i++) {
         std::cerr << "[" << i << "] " << json_params->u.array.values[i]->u.string.ptr << std::endl;
     }
     /*
