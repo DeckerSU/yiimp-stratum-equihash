@@ -7,7 +7,7 @@ class YAAMP_COIND_AUX;
 
 struct YAAMP_JOB_VALUES
 {
-	char coinbase[4*1024];
+	char coinbase[16*1024];
 	char merkleroot_be[1024];
 
 	char header[1024];
