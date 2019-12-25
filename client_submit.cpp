@@ -95,6 +95,19 @@ void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE
 #endif
 
     // TODO: create a correct equihash blockheader
+    /*
+        var header =  new Buffer(140);
+        var position = 0;
+
+        header.writeUInt32LE(this.rpcData.version, position += 0, 4, 'hex');
+        header.write(this.prevHashReversed, position += 4, 32, 'hex');
+        header.write(this.merkleRootReversed, position += 32, 32, 'hex');
+        header.write(this.hashReserved, position += 32, 32, 'hex'); 
+        header.write(nTime, position += 32, 4, 'hex');
+        header.write(util.reverseBuffer(new Buffer(rpcData.bits, 'hex')).toString('hex'), position += 4, 4, 'hex');
+        header.write(nonce, position += 4, 32, 'hex');
+    */
+
     {
         sprintf(submitvalues->header, "%s%s%s%s%s%s", templ->version, templ->prevhash_be, submitvalues->merkleroot_be,
             ntime, templ->nbits, nonce);
@@ -108,9 +121,11 @@ void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE
     //	printf("%s\n", submitvalues->header_be);
 	int header_len = strlen(submitvalues->header)/2;
 	g_current_algo->hash_function((char *)submitvalues->header_bin, (char *)submitvalues->hash_bin, header_len);
+    
 
 	hexlify(submitvalues->hash_hex, submitvalues->hash_bin, 32);
 	string_be(submitvalues->hash_hex, submitvalues->hash_be);
+    std::cerr << "  blockhash: " << submitvalues->hash_be << std::endl;
 }
 /////////////////////////////////////////////
 
@@ -758,7 +773,8 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
 
 	// minimum hash diff begins with 0000, for all...
 	uint8_t pfx = submitvalues.hash_bin[30] | submitvalues.hash_bin[31];
-	if(pfx) {
+	
+    if(0 && pfx) {
 		if (g_debuglog_hash) {
 			debuglog("Possible %s error, hash starts with %02x%02x%02x%02x\n", g_current_algo->name,
 				(int) submitvalues.hash_bin[31], (int) submitvalues.hash_bin[30],
