@@ -53,6 +53,7 @@ struct YAAMP_JOB_TEMPLATE
 
 	char coinb1[4*1024];
 	char coinb2[4*1024];
+    char coinbase[16*1024];
 
 	char header[256];
 

@@ -463,6 +463,18 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
         templ->value = json_get_int(json_coinbasetxn, "coinbasevalue");
         const char *p = json_get_string(json_coinbasetxn, "hash");
 		const char *d = json_get_string(json_coinbasetxn, "data");
+        
+        if ((strlen(d) + 1) < (sizeof(templ->coinbase)/sizeof(templ->coinbase[0])))
+            {
+                strcpy(templ->coinbase, d);
+                // std::cerr << templ->coinbase << std::endl;
+            }
+        else
+            {
+                coind_error(coind, "coinbasetxn doesn't fit in template");
+                json_value_free(json);
+                return NULL;
+            }
 
         char hash_be[256] = { 0 };
         string_be(p, hash_be);
