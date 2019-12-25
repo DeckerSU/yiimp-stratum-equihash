@@ -67,9 +67,11 @@ void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE
     std::cerr << "nonce = " << nonce << std::endl;
     std::cerr << "equi_solution = " << equi_solution << std::endl;
 
-
-	sprintf(submitvalues->coinbase, "%s%s%s%s", templ->coinb1, nonce1, nonce2, templ->coinb2);
+    // let's assemble coinbase
+	// sprintf(submitvalues->coinbase, "%s%s%s%s", templ->coinb1, nonce1, nonce2, templ->coinb2);
+    sprintf(submitvalues->coinbase, "%s", templ->coinbase);
 	int coinbase_len = strlen(submitvalues->coinbase);
+    std::cerr << "coinbase[" << coinbase_len << "] = " << submitvalues->coinbase << std::endl;
 
 	unsigned char coinbase_bin[1024];
 	memset(coinbase_bin, 0, 1024);
