@@ -1,5 +1,5 @@
 
-#define YAAMP_SOCKET_BUFSIZE	(2*1024)
+#define YAAMP_SOCKET_BUFSIZE	(4*1024)
 
 struct YAAMP_SOCKET
 {
