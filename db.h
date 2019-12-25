@@ -3,7 +3,11 @@ class YAAMP_CLIENT;
 
 struct YAAMP_DB
 {
+	#ifndef NO_MYSQL
 	MYSQL mysql;
+	#else
+	int fakesql;
+	#endif
 
 };
 

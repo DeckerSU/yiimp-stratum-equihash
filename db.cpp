@@ -10,6 +10,7 @@ void db_reconnect(YAAMP_DB *db)
 		return;
 	}
 
+	#ifndef NO_MYSQL
 	mysql_init(&db->mysql);
 	for(int i=0; i<6; i++)
 	{
@@ -22,6 +23,9 @@ void db_reconnect(YAAMP_DB *db)
 		mysql_close(&db->mysql);
 		mysql_init(&db->mysql);
 	}
+	#else
+	db->fakesql = 1;
+	#endif
 }
 
 YAAMP_DB *db_connect()
@@ -35,7 +39,11 @@ YAAMP_DB *db_connect()
 void db_close(YAAMP_DB *db)
 {
 	if (db) {
+		#ifndef NO_MYSQL
 		mysql_close(&db->mysql);
+		#else
+		db->fakesql = 0;
+		#endif
 		delete db;
 	}
 	db = NULL;
@@ -82,11 +90,21 @@ void db_query(YAAMP_DB *db, const char *format, ...)
 
 	while(!g_exiting)
 	{
+		#ifndef NO_MYSQL
 		int res = mysql_query(&db->mysql, buffer);
+		#else
+		//stratumlog("FAKE SQL QUERY: %s\n", buffer);
+		int res = 0; // emulating success state of mysql_query
+		#endif
 		if(!res) break;
+		#ifndef NO_MYSQL
 		res = mysql_errno(&db->mysql);
-
 		stratumlog("SQL ERROR: %d, %s\n", res, mysql_error(&db->mysql));
+		#else
+		res = CR_SERVER_LOST;
+		#endif
+
+		
 		if(res == ER_DUP_ENTRY) break; // rarely seen on new user creation
 		if(res != CR_SERVER_GONE_ERROR && res != CR_SERVER_LOST) exit(1);
 
@@ -141,7 +159,8 @@ void db_update_algos(YAAMP_DB *db)
 	///////////////////////////////////////////////////////////////////////////////////////////
 
 	db_query(db, "select name, profit, rent, factor from algos");
-
+	
+	#ifndef NO_MYSQL
 	MYSQL_RES *result = mysql_store_result(&db->mysql);
 	if(!result) return;
 
@@ -155,9 +174,9 @@ void db_update_algos(YAAMP_DB *db)
 		if(row[2]) algo->rent = atof(row[2]);
 		if(row[3]) algo->factor = atof(row[3]);
 	}
-
 	mysql_free_result(result);
-
+	#endif
+	
 	////////////////////
 
 	g_list_client.Enter();
@@ -196,14 +215,65 @@ void db_update_coinds(YAAMP_DB *db)
 		"rpccurl, rpcssl, rpccert, account, multialgos, max_miners, max_shares, usesegwit "
 		"FROM coins WHERE enable AND auto_ready AND algo='%s' ORDER BY index_avg", g_stratum_algo);
 
+	#ifndef NO_MYSQL
 	MYSQL_RES *result = mysql_store_result(&db->mysql);
 	if(!result) yaamp_error("Cant query database");
 
 	MYSQL_ROW row;
 	g_list_coind.Enter();
-
 	while((row = mysql_fetch_row(result)) != NULL)
-	{
+    {
+    #else
+    // should be in configs in future, but now it's hardcoded
+    #define NUM_COINS 1
+    #define NUM_PARAMS 36
+    char *coins_data[NUM_COINS][NUM_PARAMS] = {
+        {   "1",         // [0] coin id
+            "Stratum",    // [1] name
+            "127.0.0.1", // [2] rpc.host
+            "12124", // [3] rpc.port
+            "user976830345", // [4] rpc.user
+            "passa74c7dc75048f21d26bd45bc9e844a94dd5265f31414f6e6a985d8090608078a6f", // [5] rpc.pass
+            "POW", // [6] rpcencoding / pos
+            "RU9kxU7Qri1PNHXB1KEvDa1aZ2g4T8NM2x", // [7] wallet
+            NULL, // [8] reward
+            NULL, // [9] price (float)
+            "1", // [10] hassubmitblock
+            NULL, // [11] txmessage
+            "1",  // [12] enable
+            "1",  // [13] auto_ready
+            NULL, // [14]
+            NULL, // [15] pool_ttf
+            NULL, // [16] charity_address 
+            NULL, // [17] charity_amount (float)
+            NULL, // [18] charity_percent (float)
+            NULL, // [19] reward_mul (float)
+            "STRATUM", // [20] symbol
+            "0", // [21] isaux
+            NULL, // [22] actual_ttf
+            NULL, // [23] actual_ttf
+            NULL, // [24] usememorypool
+            "0",  // [25] hasmasternodes
+            "equihash", // [26] algo
+            NULL, // [27]
+            NULL, // [28]
+            NULL, // [29]
+            NULL, // [30]
+            NULL, // [31]
+            NULL, // [32]
+            NULL, // [33]
+            NULL, // [34]
+            NULL, // [35] usesegwit
+        },
+        
+    };
+    char **row; int coin_idx;
+    g_list_coind.Enter();
+    for (coin_idx = 0; coin_idx < NUM_COINS; coin_idx++) 
+    {
+        row = coins_data[coin_idx];
+    #endif
+	
 		YAAMP_COIND *coind = (YAAMP_COIND *)object_find(&g_list_coind, atoi(row[0]));
 		if(!coind)
 		{
@@ -289,7 +359,7 @@ void db_update_coinds(YAAMP_DB *db)
 		coind->actual_ttf = min(coind->actual_ttf, 120);
 		coind->actual_ttf = max(coind->actual_ttf, 20);
 
-		if(row[24]) coind->usememorypool = atoi(row[24]);
+		if(row[24]) coind->usememorypool  = atoi(row[24]);
 		if(row[25]) coind->hasmasternodes = atoi(row[25]);
 
 		if(row[26]) strcpy(coind->algo, row[26]);
@@ -351,8 +421,9 @@ void db_update_coinds(YAAMP_DB *db)
 		coind->touch = true;
 		coind_create_job(coind);
 	}
-
+    #ifndef NO_MYSQL
 	mysql_free_result(result);
+    #endif
 
 	for(CLI li = g_list_coind.first; li; li = li->next)
 	{
@@ -379,7 +450,7 @@ void db_update_remotes(YAAMP_DB *db)
 	if(!db) return;
 
 	db_query(db, "select id, speed/1000000, host, port, username, password, time, price, renterid from jobs where active and ready and algo='%s' order by time", g_stratum_algo);
-
+	#ifndef NO_MYSQL
 	MYSQL_RES *result = mysql_store_result(&db->mysql);
 	if(!result) yaamp_error("Cant query database");
 
@@ -449,6 +520,7 @@ void db_update_remotes(YAAMP_DB *db)
 	}
 
 	mysql_free_result(result);
+	#endif
 
 	///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -510,7 +582,8 @@ void db_update_renters(YAAMP_DB *db)
 	if(!db) return;
 
 	db_query(db, "select id, balance, updated from renters");
-
+	
+	#ifndef NO_MYSQL
 	MYSQL_RES *result = mysql_store_result(&db->mysql);
 	if(!result) yaamp_error("Cant query database");
 
@@ -536,6 +609,7 @@ void db_update_renters(YAAMP_DB *db)
 	}
 
 	mysql_free_result(result);
+	#endif
 	g_list_renter.Leave();
 }
 
@@ -551,7 +625,11 @@ static void _json_str_safe(YAAMP_DB *db, json_value *json, const char *key, size
 		snprintf(str, sizeof(str)-1, "%s", json_string_value(val));
 		str[maxlen-1] = '\0'; // truncate to dest len
 		clean_html(str);
+		#ifndef NO_MYSQL
 		mysql_real_escape_string(&db->mysql, escaped, str, strlen(str));
+		#else
+		mysql_real_escape_string(NULL, escaped, str, strlen(str));
+		#endif
 		snprintf(out, maxlen, "%s", escaped);
 		out[maxlen-1] = '\0';
 	}
