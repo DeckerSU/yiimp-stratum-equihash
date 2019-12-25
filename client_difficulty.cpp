@@ -74,11 +74,39 @@ int client_send_difficulty(YAAMP_CLIENT *client, double difficulty)
 //	debuglog("%s diff %f\n", client->sock->ip, difficulty);
 	client->shares_per_minute = YAAMP_SHAREPERSEC;
 
-	if(difficulty >= 1)
-		client_call(client, "mining.set_difficulty", "[%.0f]", difficulty);
-	else
-		client_call(client, "mining.set_difficulty", "[%.3f]", difficulty);
-	return 0;
+    if (g_current_algo->name && !strcmp(g_current_algo->name,"equihash")) 
+        {
+                // send mindiff on client_authorize (temp)
+                
+                // ZEC uses a different scale to compute diff... 
+                // sample targets to diff (stored in the reverse byte order in work->target)
+                // 0007fff800000000000000000000000000000000000000000000000000000000 is stratum diff 32
+                // 003fffc000000000000000000000000000000000000000000000000000000000 is stratum diff 4
+                // 00ffff0000000000000000000000000000000000000000000000000000000000 is stratum diff 1
+
+                // 00000f0f0f0f0f0f0f0000000000000000000000000000000000000000000000 is stratum diff 4351.93 (136)
+                // 00000f0fffffffffffffffffffffffffffffffffffffffffffffffffffffffff is stratum diff 4352 (136)
+                
+                uint8_t equi_target[32] = { 0 };
+                char target_str[65]; target_str[64] = 0;
+                char target_str_be[65]; target_str_be[64] = 0;
+
+                diff_to_target_equi((uint32_t *)equi_target, 1); // 4352 <-- don't forget to change it on real diff
+               	hexlify(target_str, equi_target, 32);
+                string_be(target_str, target_str_be);
+                // debuglog("target_str    : %s\n", target_str);
+                // debuglog("target_str_be : %s\n", target_str_be );
+               
+                client_call(client, "mining.set_target", "[\"%s\"]", target_str_be);
+        }
+    else
+        {
+            if(difficulty >= 1)
+                client_call(client, "mining.set_difficulty", "[%.0f]", difficulty);
+            else
+                client_call(client, "mining.set_difficulty", "[%.3f]", difficulty);
+            return 0;
+        }
 }
 
 void client_initialize_difficulty(YAAMP_CLIENT *client)

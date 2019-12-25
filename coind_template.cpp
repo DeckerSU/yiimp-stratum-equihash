@@ -305,6 +305,13 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 	strcpy(templ->nbits, bits ? bits : "");
 	const char *prev = json_get_string(json_result, "previousblockhash");
 	strcpy(templ->prevhash_hex, prev ? prev : "");
+
+    // equihash
+    if (!strcmp(g_stratum_algo, "equihash")) {
+        const char *finalsaplingroothash = json_get_string(json_result, "finalsaplingroothash");
+        strcpy(templ->extradata_hex, finalsaplingroothash ? finalsaplingroothash : "");
+        string_be(templ->extradata_hex,templ->extradata_be);
+    }
 	
 	const char *flags;
 	if(!json_coinbaseaux && coind->isaux)
@@ -438,6 +445,74 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 		}
 	}
 
+    // for equihash we need to insert coinbasetxn here
+    if (!strcmp(g_stratum_algo, "equihash")) {
+
+        json_value *json_coinbasetxn = json_get_object(json_result, "coinbasetxn");
+        if(!json_coinbasetxn)
+        {
+            coind_error(coind, "getblocktemplate coinbasetxn");
+            json_value_free(json);
+            return NULL;
+        }
+        
+        // coinbase_create_equi(coind, templ, json_result);
+        // here we will take coinbase tx from rpcdata, instead of manually creation
+        // TODO: implement coinbase_create_equi
+
+        templ->value = json_get_int(json_coinbasetxn, "coinbasevalue");
+        const char *p = json_get_string(json_coinbasetxn, "hash");
+		const char *d = json_get_string(json_coinbasetxn, "data");
+
+        char hash_be[256] = { 0 };
+        string_be(p, hash_be);
+        
+        /*
+        std::cout << "txhashes.size() = " << txhashes.size() << " - " << (txhashes.size() % 2) << std::endl;
+        std::cerr << "[ Decker ] txhashes[" << txhashes.size() << "] = " << std::endl;
+        for (int i=0; i < txhashes.size(); i++) {
+            std::string hex(txhashes[i]);
+            for (std::string::iterator it=hex.begin(); it != hex.end(); it += 2) std::swap(it[0], it[1]);
+            std::string hex_reversed(hex.rbegin(), hex.rend());
+            std::cerr << "[" << i << "] \"" << txhashes[i] << "\" - " "\"" << hex_reversed << "\""<< std::endl;
+        }
+        */
+        vector<std::string> txsteps = merkle_steps(txhashes);
+        /*
+        std::cerr << "merkle steps [" << txsteps.size() << "] :" << std::endl;
+        for (int i=0; i<txsteps.size(); i++) {
+            std::string hex(txsteps[i]);
+            for (std::string::iterator it=hex.begin(); it != hex.end(); it += 2) std::swap(it[0], it[1]);
+            std::string hex_reversed(hex.rbegin(), hex.rend());
+            std::cerr << "[" << i << "] \"" << txsteps[i] << "\" - " "\"" << hex_reversed << "\""<< std::endl;
+            
+        }
+        */
+        std::string mr = merkle_with_first(txsteps, hash_be);
+        std::string hex(mr);
+        for (std::string::iterator it=hex.begin(); it != hex.end(); it += 2) std::swap(it[0], it[1]);
+        std::string hex_reversed(hex.rbegin(), hex.rend());
+        //std::cerr << hex_reversed << std::endl;
+        strcpy(templ->mr_hex,hex_reversed.c_str());
+
+        // standart - merkle_arr = txsteps = templ->txmerkles       - // https://github.com/slushpool/poclbm-zcash/wiki/Stratum-protocol-changes-for-ZCash
+        // equishash - merkle_arr->merkleroot (including coinbase)  - // https://en.bitcoin.it/wiki/Stratum_mining_protocol#mining.notify
+
+        /*
+
+        4cdfc3b122d2513988817361c31734e7ebc597f9f78e90294722c97e9a0bece9
+
+        [1] "a9e27225d809d08f2bd17e03d4e0b8d63c9f1d9da7196585b017cea9586a97b1" b1976a58a9ce17b0856519a79d1d9f3cd6b8e0d4037ed12b8fd009d82572e2a9
+        [2] "03889a9f0e45c74a44f8872c971164582693e76511a37fe8df7d093c4024d3f2" f2d324403c097ddfe87fa31165e79326586411972c87f8444ac7450e9f9a8803
+        [3] "9371d068ace5130e7a8ce8e80c0d9448bb3b97b581c0285ba7d04d27e4660411" 110466e4274dd0a75b28c081b5973bbb48940d0ce8e88c7a0e13e5ac68d07193
+
+        https://en.bitcoin.it/wiki/Stratum_mining_protocol#mining.notify
+        List of merkle branches. The generation transaction is hashed against the merkle branches to build the final merkle root.
+
+        */
+    }
+
+
 	if (templ->has_filtered_txs) {
 		// coinbasevalue is a total with all tx fees, need to reduce it if some are skipped
 		templ->value -= templ->filtered_txs_fee;
@@ -492,7 +567,7 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 	if(templ->txmerkles[0])
 		templ->txmerkles[strlen(templ->txmerkles)-1] = 0;
 
-//	debuglog("merkle transactions %d [%s]\n", templ->txcount, templ->txmerkles);
+	// debuglog("merkle transactions %d [%s]\n", templ->txcount, templ->txmerkles);
 	ser_string_be2(templ->prevhash_hex, templ->prevhash_be, 8);
 
 	if(!strcmp(coind->symbol, "LBC"))
@@ -502,6 +577,7 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 		coind_aux_build_auxs(templ);
 
 	coinbase_create(coind, templ, json_result);
+    
 	json_value_free(json);
 
 	return templ;

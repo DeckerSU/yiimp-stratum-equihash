@@ -30,10 +30,50 @@ static void job_mining_notify_buffer(YAAMP_JOB *job, char *buffer)
 			templ->txmerkles, templ->version, templ->nbits, templ->ntime);
 		return;
 	}
+    // equihash job
+
+    /*
+        // blockTemplate.js
+        this.jobParams = [
+                this.jobId,
+                util.packUInt32LE(this.rpcData.version).toString('hex'),
+                this.prevHashReversed,
+                this.merkleRootReversed,
+                this.hashReserved, //hashReserved
+                util.packUInt32LE(rpcData.curtime).toString('hex'),
+                util.reverseBuffer(new Buffer(this.rpcDta.bits, 'hex')).toString('hex'),
+                true
+            ];
+    */
+
+    if (!strcmp(g_stratum_algo, "equihash")) {
+        char rev_version[32] = {0};
+        char prevHashReversed[65] = {0};
+        char merkleRootReversed[65] = {0};
+        char rev_ntime[32] = {0};
+        char rev_nbits[32] = {0};
+
+        
+        string_be(templ->version,rev_version);
+        string_be(templ->prevhash_hex,prevHashReversed);
+        string_be(templ->mr_hex,merkleRootReversed);
+        
+        //memset(merkleRootReversed, 0x30, 64); merkleRootReversed[65] = 0;
+        
+        string_be(templ->ntime,rev_ntime);
+        string_be(templ->nbits,rev_nbits);
+        // https://github.com/slushpool/poclbm-zcash/wiki/Stratum-protocol-changes-for-ZCash
+        // jobId, version, prevHashReversed, merkleRootReversed, hashReserved (finalsaplingroothash), curtime, nbits
+        sprintf(buffer, "{\"id\":null,\"method\":\"mining.notify\",\"params\":[\"%x\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",true]}\n",
+		job->id, rev_version, prevHashReversed, merkleRootReversed, templ->extradata_be, rev_ntime, rev_nbits);
+        return;
+    }
 
 	// standard stratum
+    // https://en.bitcoin.it/wiki/Stratum_mining_protocol#mining.notify
 	sprintf(buffer, "{\"id\":null,\"method\":\"mining.notify\",\"params\":[\"%x\",\"%s\",\"%s\",\"%s\",[%s],\"%s\",\"%s\",\"%s\",true]}\n",
 		job->id, templ->prevhash_be, templ->coinb1, templ->coinb2, templ->txmerkles, templ->version, templ->nbits, templ->ntime);
+    
 }
 
 static YAAMP_JOB *job_get_last(int coinid)

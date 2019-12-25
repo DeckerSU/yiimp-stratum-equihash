@@ -118,8 +118,18 @@ bool client_subscribe(YAAMP_CLIENT *client, json_value *json_params)
 		debuglog("new client with nonce %s\n", client->extranonce1);
 	}
 
-	client_send_result(client, "[[[\"mining.set_difficulty\",\"%.3g\"],[\"mining.notify\",\"%s\"]],\"%s\",%d]",
-		client->difficulty_actual, client->notify_id, client->extranonce1, client->extranonce2size);
+    if (g_current_algo->name && !strcmp(g_current_algo->name,"equihash")) {
+        // 0 - ?, 1 - xnonce1 (extranonce1) [string], 2 - xn2_size
+        // ccminer: xn1_size = (int)strlen(xnonce1) / 2, xn2_size = 32 - xn1_size; // xn1_size = 4, xn2_size = 28
+        client_send_result(client, "[null,\"%s\"]", client->extranonce1);
+    }
+    else
+    {   // and mining.set_difficulty for all other coins
+        client_send_result(client, "[[[\"mining.set_difficulty\",\"%.3g\"],[\"mining.notify\",\"%s\"]],\"%s\",%d]",
+        client->difficulty_actual, client->notify_id, client->extranonce1, client->extranonce2size);
+    }
+
+	
 
 	return true;
 }

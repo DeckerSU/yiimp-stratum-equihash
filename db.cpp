@@ -235,7 +235,7 @@ void db_update_coinds(YAAMP_DB *db)
             "user976830345", // [4] rpc.user
             "passa74c7dc75048f21d26bd45bc9e844a94dd5265f31414f6e6a985d8090608078a6f", // [5] rpc.pass
             "POW", // [6] rpcencoding / pos
-            "RU9kxU7Qri1PNHXB1KEvDa1aZ2g4T8NM2x", // [7] wallet
+            "RDEpzVM4g2ohN2geRyQiVkD5ufqXWEaYN4", // [7] wallet
             NULL, // [8] reward
             NULL, // [9] price (float)
             "1", // [10] hassubmitblock
