@@ -67,6 +67,12 @@ void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE
     std::cerr << "nonce = " << nonce << std::endl;
     //std::cerr << "equi_solution = " << equi_solution << std::endl;
 
+    /*
+    nonce1 = 81000002
+    nonce  = 0000000000000000d404000001000000000000000000000000000000
+    810000020000000000000000d404000001000000000000000000000000000000 - full nonce
+    */
+
     // let's assemble coinbase
 	// sprintf(submitvalues->coinbase, "%s%s%s%s", templ->coinb1, nonce1, nonce2, templ->coinb2);
     sprintf(submitvalues->coinbase, "%s", templ->coinbase);
@@ -130,9 +136,23 @@ void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE
         string_be(ntime,rev_ntime);
         string_be(templ->nbits,rev_nbits);
 
+        /*
+        char rev_nonce1[9] = {0};
+        char rev_nonce[65] = {0};
+        string_be(nonce1, rev_nonce1);
+        string_be(nonce, rev_nonce);
+        */
+
+        // full nonce[32] = nonce1[4] + nonce[from miner]
+        // nonce1 - given to a miner by pool
+        // nonce  - come from miner
+
+        std::cerr << "[!] nonceN = " << nonce1 << nonce << std::endl;
+        //std::cerr << "[!] nonceR = " << rev_nonce << rev_nonce1 << std::endl;
         
-        sprintf(submitvalues->header, "%s%s%s%s%s%s00000000%s%s", rev_version, templ->prevhash_be, submitvalues->merkleroot_be,
-            templ->extradata_be, rev_ntime, rev_nbits, nonce, equi_solution);
+        sprintf(submitvalues->header, "%s%s%s%s%s%s%s%s%s", rev_version, templ->prevhash_be, submitvalues->merkleroot_be,
+            templ->extradata_be, rev_ntime, rev_nbits, nonce1, nonce, equi_solution);
+
         //std::cerr << "strlen(submitvalues->header) = " << strlen(submitvalues->header) << std::endl;
         //ser_string_be(submitvalues->header, submitvalues->header_be, 20); // 20? 
         
