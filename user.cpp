@@ -21,7 +21,8 @@ void db_check_coin_symbol(YAAMP_DB *db, char* symbol)
 #else
 		db_query(db, "SELECT symbol FROM coins WHERE installed AND (symbol='%s' OR symbol2='%s')", symbol, symbol);
 #endif
-		MYSQL_RES *result = mysql_store_result(&db->mysql);
+#ifndef NO_MYSQL	
+        MYSQL_RES *result = mysql_store_result(&db->mysql);
 		*symbol = '\0';
 		if (!result) return;
 		MYSQL_ROW row = mysql_fetch_row(result);
@@ -29,6 +30,11 @@ void db_check_coin_symbol(YAAMP_DB *db, char* symbol)
 			strcpy(symbol, row[0]);
 		}
 		mysql_free_result(result);
+#else
+        *symbol = '\0';
+
+#endif        
+
 	} else {
 		*symbol = '\0';
 	}
@@ -81,6 +87,7 @@ void db_add_user(YAAMP_DB *db, YAAMP_CLIENT *client)
 	// debuglog("user %s %s gives %d %\n", client->username, symbol, gift);
 	db_query(db, "SELECT id, is_locked, logtraffic, coinid, donation FROM accounts WHERE username='%s'", client->username);
 
+    #ifndef NO_MYSQL
 	MYSQL_RES *result = mysql_store_result(&db->mysql);
 	if(!result) return;
 
@@ -96,6 +103,7 @@ void db_add_user(YAAMP_DB *db, YAAMP_CLIENT *client)
 	}
 
 	mysql_free_result(result);
+    #endif
 
 	db_check_user_input(symbol);
 	db_check_coin_symbol(db, symbol);
@@ -110,7 +118,11 @@ void db_add_user(YAAMP_DB *db, YAAMP_CLIENT *client)
 	{
 		db_query(db, "INSERT INTO accounts (username, coinsymbol, balance, donation, hostaddr) values ('%s', '%s', 0, %d, '%s')",
 			client->username, symbol, gift, client->sock->ip);
+        #ifndef NO_MYSQL
 		client->userid = (int)mysql_insert_id(&db->mysql);
+        #else
+        client->userid = 0;
+        #endif
 	}
 
 	else {
@@ -118,10 +130,13 @@ void db_add_user(YAAMP_DB *db, YAAMP_CLIENT *client)
 			" AND (SELECT COUNT(id) FROM payouts WHERE account_id=%d AND tx IS NULL) = 0" // failed balance
 			" AND (SELECT pending FROM balanceuser WHERE userid=%d ORDER by time DESC LIMIT 1) = 0" // pending balance
 			, symbol, (uint) time(NULL), gift, client->sock->ip, client->userid, client->userid, client->userid);
-		if (mysql_affected_rows(&db->mysql) > 0 && strlen(symbol)) {
+		#ifndef NO_MYSQL
+        if (mysql_affected_rows(&db->mysql) > 0 && strlen(symbol)) {
 			debuglog("%s: %s coinsymbol set to %s ip %s uid (%d)\n",
 				g_current_algo->name, client->username, symbol, client->sock->ip, client->userid);
 		}
+        #endif
+
 	}
 }
 
@@ -166,8 +181,11 @@ void db_add_worker(YAAMP_DB *db, YAAMP_CLIENT *client)
 		"VALUES (%d, '%s', '%s', %f, '%s', '%s', '%s', '%s', %d, %d)",
 		client->userid, client->sock->ip, client->username, client->difficulty_actual,
 		version, password, worker, g_stratum_algo, now, getpid());
-
+    #ifndef NO_MYSQL
 	client->workerid = (int)mysql_insert_id(&db->mysql);
+    #else
+    client->workerid = 0;
+    #endif
 }
 
 void db_update_workers(YAAMP_DB *db)
