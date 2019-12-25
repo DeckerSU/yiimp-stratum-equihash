@@ -5,14 +5,16 @@ class YAAMP_REMOTE;
 class YAAMP_COIND;
 class YAAMP_COIND_AUX;
 
+#define EQUI_HEADER_SIZE (4+32+32+32+4+4+32 + 1344 + 3)
 struct YAAMP_JOB_VALUES
 {
 	char coinbase[16*1024];
 	char merkleroot_be[1024];
 
-	char header[1024];
-	char header_be[1024];
-	unsigned char header_bin[1024];
+
+	char header[EQUI_HEADER_SIZE * 2];
+	char header_be[EQUI_HEADER_SIZE * 2];
+	unsigned char header_bin[EQUI_HEADER_SIZE];
 
 	char hash_hex[1024];
 	char hash_be[1024];
