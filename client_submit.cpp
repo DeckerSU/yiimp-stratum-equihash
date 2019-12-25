@@ -88,7 +88,8 @@ void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE
 	merkle_hash((char *)coinbase_bin, doublehash, coinbase_len/2);
 
 	string merkleroot = merkle_with_first(templ->txsteps, doublehash);
-	ser_string_be(merkleroot.c_str(), submitvalues->merkleroot_be, 8);
+	//ser_string_be(merkleroot.c_str(), submitvalues->merkleroot_be, 8);
+    strcpy(submitvalues->merkleroot_be, merkleroot.c_str());
     std::cerr << "merkle root: " << merkleroot << std::endl;
 
 #ifdef MERKLE_DEBUGLOG
