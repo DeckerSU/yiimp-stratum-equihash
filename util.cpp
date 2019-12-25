@@ -527,6 +527,49 @@ double target_to_diff(uint64_t target)
 	return d;
 }
 
+// equihash (from ccminer equi-stratum.cpp)
+
+// ZEC uses a different scale to compute diff... 
+// sample targets to diff (stored in the reverse byte order in work->target)
+// 0007fff800000000000000000000000000000000000000000000000000000000 is stratum diff 32
+// 003fffc000000000000000000000000000000000000000000000000000000000 is stratum diff 4
+// 00ffff0000000000000000000000000000000000000000000000000000000000 is stratum diff 1
+double target_to_diff_equi(uint32_t* target)
+{
+    char* tgt = (char*) target;
+    uint64_t m =
+        (uint64_t)tgt[30] << 24 |
+        (uint64_t)tgt[29] << 16 |
+        (uint64_t)tgt[28] << 8  |
+        (uint64_t)tgt[27] << 0;
+
+    if (!m)
+        return 0.;
+    else
+        return (double)0xffff0000UL/m;
+}
+
+void diff_to_target_equi(uint32_t *target, double diff)
+{
+    uint64_t m;
+    int k;
+
+    for (k = 6; k > 0 && diff > 1.0; k--)
+        diff /= 4294967296.0;
+    m = (uint64_t)(4294901760.0 / diff);
+    if (m == 0 && k == 6)
+        memset(target, 0xff, 32);
+    else {
+        memset(target, 0, 32);
+        target[k + 1] = (uint32_t)(m >> 8);
+        target[k + 2] = (uint32_t)(m >> 40);
+        //memset(target, 0xff, 6*sizeof(uint32_t));
+        for (k = 0; k < 28 && ((uint8_t*)target)[k] == 0; k++)
+            ((uint8_t*)target)[k] = 0xff;
+    }
+}
+
+
 uint64_t decode_compact(const char *input)
 {
 	uint64_t c = htoi64(input);
