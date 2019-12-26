@@ -4,8 +4,8 @@ CC=gcc
 #CFLAGS=-c -g -I /usr/include/mysql
 #LDFLAGS=-g
 
-CXXFLAGS = -O2 -I.. -march=native
-CFLAGS= $(CXXFLAGS) -std=gnu99
+CXXFLAGS = -g -O2 -I.. -march=native
+CFLAGS= $(CXXFLAGS) -std=gnu99 -g
 LDFLAGS=-O2 -lgmp
 
 SOURCES=lyra2re.c lyra2v2.c lyra2v3.c Lyra2.c lyra2z.c Lyra2-z.c lyra2zz.c Lyra2-zz.c Sponge.c allium.c \
