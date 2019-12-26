@@ -768,9 +768,56 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
                 return true;
             }
     }
-	uint64_t hash_int = get_hash_difficulty(submitvalues.hash_bin);
+	
+    // TODO: implement equihash diff calculation
+    if (g_current_algo->name && !strcmp(g_current_algo->name,"equihash")) {
+        
+        /*
+        fprintf(stderr,"submitvalues.hash_bin:\n");
+        for (int i=31; i>=0; i--) {
+            fprintf(stderr,"%02x",submitvalues.hash_bin[i] & 0xff);
+        }
+        fprintf(stderr,"\n");
+        */
+        
+        // diff calc from KMD ... 
+        uint32_t bits = *((uint32_t *)&submitvalues.header_bin[4 + 32 * 3 + 4]);
+        //uint32_t powLimit = UintToArith256(Params().GetConsensus().powLimit).GetCompact(); // 0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f
+        uint32_t powLimit = 0x200f0f0f;
+        int nShift = (bits >> 24) & 0xff;
+        int nShiftAmount = (powLimit >> 24) & 0xff;
+
+        double dDiff =
+            (double)(powLimit & 0x00ffffff) /
+            (double)(bits & 0x00ffffff);
+
+        while (nShift < nShiftAmount)
+        {
+            dDiff *= 256.0;
+            nShift++;
+        }
+        while (nShift > nShiftAmount)
+        {
+            dDiff /= 256.0;
+            nShift--;
+        }
+        
+        uint8_t equi_target[32] = { 0 }; char target_str[65]; target_str[64] = 0; char target_str_be[65]; target_str_be[64] = 0;
+        diff_to_target_equi((uint32_t *)equi_target, dDiff);  
+        hexlify(target_str, equi_target, 32); string_be(target_str, target_str_be);
+        
+        debuglog("block bits: 0x%08x, diff(block bits): %f, target(block bits): %s\n", bits, dDiff, target_str_be);
+        debuglog("share diff: %.3f\n", target_to_diff_equi((uint32_t *)submitvalues.hash_bin));
+
+        // debuglog("%f\n", target_to_diff_equi((uint32_t *) submitvalues.hash_bin));
+        // client_submit_error(client, job, 25, "Decker rejected this :)", extranonce2, ntime, nonce);
+        // return true;
+    }
+
+    uint64_t hash_int = get_hash_difficulty(submitvalues.hash_bin);
 	uint64_t user_target = diff_to_target(client->difficulty_actual);
 	uint64_t coin_target = decode_compact(templ->nbits);
+
 	if (templ->nbits && !coin_target) coin_target = 0xFFFF000000000000ULL;
 
 	if (g_debuglog_hash) {
