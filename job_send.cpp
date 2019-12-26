@@ -66,7 +66,7 @@ static void job_mining_notify_buffer(YAAMP_JOB *job, char *buffer)
         // https://github.com/slushpool/poclbm-zcash/wiki/Stratum-protocol-changes-for-ZCash
         // jobId, version, prevHashReversed, merkleRootReversed, hashReserved (finalsaplingroothash), curtime, nbits
         //sprintf(buffer, "{\"id\":null,\"method\":\"mining.notify\",\"params\":[\"%x\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",true ]}\n",
-        sprintf(buffer, "{\"id\":null,\"method\":\"mining.notify\",\"params\":[\"%x\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",false]}\n",
+        sprintf(buffer, "{\"id\":null,\"method\":\"mining.notify\",\"params\":[\"%x\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\", true]}\n",
 		job->id, rev_version, prevHashReversed, merkleRootReversed, templ->extradata_be, rev_ntime, rev_nbits);
         return;
     }
