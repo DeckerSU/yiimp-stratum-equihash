@@ -536,7 +536,7 @@ double target_to_diff(uint64_t target)
 // 00ffff0000000000000000000000000000000000000000000000000000000000 is stratum diff 1
 double target_to_diff_equi(uint32_t* target)
 {
-    char* tgt = (char*) target;
+    uint8_t* tgt = (uint8_t*) target;
     uint64_t m =
         (uint64_t)tgt[30] << 24 |
         (uint64_t)tgt[29] << 16 |
