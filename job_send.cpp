@@ -81,7 +81,19 @@ static void job_mining_notify_buffer(YAAMP_JOB *job, char *buffer)
 static YAAMP_JOB *job_get_last(int coinid)
 {
 	g_list_job.Enter();
-	for(CLI li = g_list_job.first; li; li = li->prev)
+    /*
+    {   // debug (iterate the list of jobs and print content)
+        CLI li = g_list_job.first;
+        for (int i = 0; i < g_list_job.count; i++) 
+        {
+            YAAMP_JOB *job = (YAAMP_JOB *)li->data;
+            std::cerr << job->coind->symbol << " " << job->coind->id << std::endl;
+            li = li->next;
+        }
+    }
+    */
+    
+	for(CLI li = g_list_job.first; li; li = li->next) // should be li->next, instead of li->prev, otherwise we will not iterate list
 	{
 		YAAMP_JOB *job = (YAAMP_JOB *)li->data;
 		if(!job_can_mine(job)) continue;
@@ -103,12 +115,14 @@ void job_send_last(YAAMP_CLIENT *client)
 #ifdef NO_EXCHANGE
 	// prefer user coin first (if available)
 	YAAMP_JOB *job = job_get_last(client->coinid);
+    if(job) debuglog("[1] job_send_last for coind \"%s\" (client->coinid.%d)\n", job->coind->symbol, client->coinid);
 	if(!job) job = job_get_last(0);
+    if(job) debuglog("[2] job_send_last for coind \"%s\" (client->coinid.%d)\n", job->coind->symbol, client->coinid);
 #else
 	YAAMP_JOB *job = job_get_last(0);
 #endif
 	if(!job) return;
-
+    if(job) debuglog("[3] job_send_last for coind \"%s\" (client->coinid.%d)\n", job->coind->symbol, client->coinid);
 	YAAMP_JOB_TEMPLATE *templ = job->templ;
 	client->jobid_sent = job->id;
 
