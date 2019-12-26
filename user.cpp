@@ -104,7 +104,7 @@ void db_add_user(YAAMP_DB *db, YAAMP_CLIENT *client)
 
 	mysql_free_result(result);
     #else
-        debuglog("user %s %s connected in no_mysql mode\n", client->username, symbol);
+        // debuglog("user %s %s connected in no_mysql mode\n", client->username, symbol);
         // now we should attach client to selected coind
         if (!client->coinid) {
         for(CLI li = g_list_coind.first; li; li = li->next) {

@@ -285,7 +285,7 @@ bool client_authorize(YAAMP_CLIENT *client, json_value *json_params)
 	client_send_result(client, "true");
 	client_send_difficulty(client, client->difficulty_actual);
 
-    debuglog("[!] job for coinid.%d\n", client->coinid);
+	//debuglog("[!] job for coinid.%d\n", client->coinid);
 	if(client->jobid_locked)
 		job_send_jobid(client, client->jobid_locked);
 	else

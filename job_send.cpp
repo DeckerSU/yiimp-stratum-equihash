@@ -115,14 +115,14 @@ void job_send_last(YAAMP_CLIENT *client)
 #ifdef NO_EXCHANGE
 	// prefer user coin first (if available)
 	YAAMP_JOB *job = job_get_last(client->coinid);
-    if(job) debuglog("[1] job_send_last for coind \"%s\" (client->coinid.%d)\n", job->coind->symbol, client->coinid);
+	//if(job) debuglog("[1] job_send_last for coind \"%s\" (client->coinid.%d)\n", job->coind->symbol, client->coinid);
 	if(!job) job = job_get_last(0);
-    if(job) debuglog("[2] job_send_last for coind \"%s\" (client->coinid.%d)\n", job->coind->symbol, client->coinid);
+	//if(job) debuglog("[2] job_send_last for coind \"%s\" (client->coinid.%d)\n", job->coind->symbol, client->coinid);
 #else
 	YAAMP_JOB *job = job_get_last(0);
 #endif
 	if(!job) return;
-    if(job) debuglog("[3] job_send_last for coind \"%s\" (client->coinid.%d)\n", job->coind->symbol, client->coinid);
+	//if(job) debuglog("[3] job_send_last for coind \"%s\" (client->coinid.%d)\n", job->coind->symbol, client->coinid);
 	YAAMP_JOB_TEMPLATE *templ = job->templ;
 	client->jobid_sent = job->id;
 

@@ -519,7 +519,7 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
             std::string hex(mr);
             for (std::string::iterator it=hex.begin(); it != hex.end(); it += 2) std::swap(it[0], it[1]);
             std::string hex_reversed(hex.rbegin(), hex.rend());
-            std::cerr << hex_reversed << std::endl;
+            //std::cerr << hex_reversed << std::endl;
             strcpy(templ->mr_hex,hex_reversed.c_str());
             //std::cerr << "Merkle (many): " << templ->mr_hex << std::endl;
         } else 
