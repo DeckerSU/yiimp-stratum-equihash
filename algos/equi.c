@@ -89,7 +89,7 @@ void digestInit(crypto_generichash_blake2b_state *S, const int n, const int k) {
     Komodo (NK assetchains) - NandKPoW
     Vidulum (VDL) - EquivPoW
   */
-  memcpy(personalization, "ZcashPoW", 8);
+  memcpy(personalization, "ZcashPoW", 9);
   memcpy(personalization + 8,  &le_N, 4);
   memcpy(personalization + 12, &le_K, 4);
   crypto_generichash_blake2b_init_salt_personal(S,
@@ -157,7 +157,7 @@ static void generateHash(crypto_generichash_blake2b_state *S, const uint32_t g, 
 }
 
 // hdr -> header including nonce (140 bytes)
-// soln -> equihash solution (excluding 3 bytes with size, so 400 bytes length)
+// soln -> equihash solution (excluding 3 bytes with size, so 1344 bytes length)
   bool verifyEH(const char *hdr, const char *soln) {
   const int n = 200;
   const int k = 9;
@@ -168,13 +168,14 @@ static void generateHash(crypto_generichash_blake2b_state *S, const uint32_t g, 
   const int hashOutput = indicesPerHashOutput * n / 8;
   const int equihashSolutionSize = (1 << k) * (n / (k + 1) + 1) / 8;
   const int solnr = 1 << k;
-  uint32_t indices[128];
+  uint32_t indices[512];
 
   crypto_generichash_blake2b_state state;
   digestInit(&state, n, k);
   crypto_generichash_blake2b_update(&state, hdr, 140);
 
-  expandArray(soln, equihashSolutionSize, (char *)&indices, sizeof(indices), collisionBitLength + 1, 0);
+  expandArray(soln, equihashSolutionSize, (char *)&indices, sizeof(indices), collisionBitLength + 1, 1);
+  
 
   uint8_t vHash[hashLength];
   memset(vHash, 0 , sizeof(vHash));
@@ -187,5 +188,6 @@ static void generateHash(crypto_generichash_blake2b_state *S, const uint32_t g, 
   	for (int k = 0; k < hashLength; ++k)
   	    vHash[k] ^= hash[k];
   }
+
   return isZero(vHash, sizeof(vHash));
 }
