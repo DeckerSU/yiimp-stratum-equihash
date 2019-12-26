@@ -2,6 +2,7 @@
 STRATUM_CONFIG=equihash.conf
 # Build 
 make -C iniparser
+make -C algos
 make -f Makefile 
 # Prepare working directory
 mkdir -p workdir

@@ -41,7 +41,7 @@ bool client_subscribe(YAAMP_CLIENT *client, json_value *json_params)
 		client->extranonce2size = client->extranonce2size_default = 12;
 	}
 
-	get_random_key(client->notify_id);
+    get_random_key(client->notify_id);
 
 	if(json_params->u.array.length>0)
 	{

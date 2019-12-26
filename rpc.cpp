@@ -261,8 +261,10 @@ json_value *rpc_call(YAAMP_RPC *rpc, char const *method, char const *params)
 		sprintf(message, "{\"method\":\"%s\",\"params\":%s,\"id\":\"%d\"}", method, params, ++rpc->id);
 	else
 		sprintf(message, "{\"method\":\"%s\",\"id\":\"%d\"}", method, ++rpc->id);
-
+	
+	// fprintf(stderr, "message: %s\n", message);
 	char *buffer = rpc_do_call(rpc, message);
+	// fprintf(stderr, "buffer: %s\n", buffer);
 
 	free(message);
 	if(!buffer) return NULL;

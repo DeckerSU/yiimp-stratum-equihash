@@ -57,6 +57,7 @@ static void job_mining_notify_buffer(YAAMP_JOB *job, char *buffer)
         string_be(templ->version,rev_version);
         string_be(templ->prevhash_hex,prevHashReversed);
         string_be(templ->mr_hex,merkleRootReversed);
+        std::cerr << "Merkle (sent): " << merkleRootReversed << std::endl;
         
         //memset(merkleRootReversed, 0x30, 64); merkleRootReversed[65] = 0;
         
@@ -64,7 +65,8 @@ static void job_mining_notify_buffer(YAAMP_JOB *job, char *buffer)
         string_be(templ->nbits,rev_nbits);
         // https://github.com/slushpool/poclbm-zcash/wiki/Stratum-protocol-changes-for-ZCash
         // jobId, version, prevHashReversed, merkleRootReversed, hashReserved (finalsaplingroothash), curtime, nbits
-        sprintf(buffer, "{\"id\":null,\"method\":\"mining.notify\",\"params\":[\"%x\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",true]}\n",
+        //sprintf(buffer, "{\"id\":null,\"method\":\"mining.notify\",\"params\":[\"%x\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",true ]}\n",
+        sprintf(buffer, "{\"id\":null,\"method\":\"mining.notify\",\"params\":[\"%x\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",false]}\n",
 		job->id, rev_version, prevHashReversed, merkleRootReversed, templ->extradata_be, rev_ntime, rev_nbits);
         return;
     }

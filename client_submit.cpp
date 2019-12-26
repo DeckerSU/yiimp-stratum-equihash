@@ -96,7 +96,7 @@ void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE
 	string merkleroot = merkle_with_first(templ->txsteps, doublehash);
 	//ser_string_be(merkleroot.c_str(), submitvalues->merkleroot_be, 8);
     strcpy(submitvalues->merkleroot_be, merkleroot.c_str());
-    std::cerr << "merkle root: " << merkleroot << std::endl;
+    std::cerr << "Merkle (build): " << merkleroot << std::endl;
 
 #ifdef MERKLE_DEBUGLOG
 	printf("merkle root %s\n", merkleroot.c_str());
@@ -156,10 +156,10 @@ void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE
         */
         sprintf(submitvalues->header, "%s%s%s%s%s%s%s%s%s", rev_version, templ->prevhash_be, submitvalues->merkleroot_be,
             templ->extradata_be, rev_ntime, rev_nbits, nonce1, nonce, equi_solution);
-
+        std::cerr << " header: " << submitvalues->header << std::endl;
         //std::cerr << "strlen(submitvalues->header) = " << strlen(submitvalues->header) << std::endl;
         //ser_string_be(submitvalues->header, submitvalues->header_be, 20); // 20? 
-        
+
         memset(submitvalues->header_be, 0, EQUI_HEADER_SIZE * 2 + 1);
         strcpy(submitvalues->header_be,submitvalues->header);
         
@@ -186,12 +186,7 @@ void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE
 	hexlify(submitvalues->hash_hex, submitvalues->hash_bin, 32);
 	string_be(submitvalues->hash_hex, submitvalues->hash_be);
     std::cerr << "  blockhash: " << submitvalues->hash_be << std::endl;
-
-    // hdr -> header including nonce (140 bytes)
-    // soln -> equihash solution (excluding 3 bytes with size, so 400 bytes length)
-    // bool verifyEH(const char *hdr, const char *soln) 
-
-
+    //std::cerr << "   verifyEH: " << verifyEH((const char *)submitvalues->header_bin, (const char *)&submitvalues->header_bin[140 + 3]) << std::endl;
 }
 /////////////////////////////////////////////
 

@@ -57,7 +57,7 @@ struct YAAMP_JOB_TEMPLATE
 	char coinb2[4*1024];
     char coinbase[16*1024];
 
-	char header[256];
+	char header[EQUI_HEADER_SIZE * 2 + 1];
 
 	bool has_segwit_txs;
 

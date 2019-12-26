@@ -92,7 +92,7 @@ int client_send_difficulty(YAAMP_CLIENT *client, double difficulty)
                 char target_str_be[65]; target_str_be[64] = 0;
 
                 // TODO: remove hardcoded diff from here ... 
-                diff_to_target_equi((uint32_t *)equi_target, 8); // 4352 <-- don't forget to change it on real diff
+                diff_to_target_equi((uint32_t *)equi_target, 2 /*difficulty*/);  
                	hexlify(target_str, equi_target, 32);
                 string_be(target_str, target_str_be);
                 // debuglog("target_str    : %s\n", target_str);
