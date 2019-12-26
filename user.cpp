@@ -31,8 +31,8 @@ void db_check_coin_symbol(YAAMP_DB *db, char* symbol)
 		}
 		mysql_free_result(result);
 #else
-        *symbol = '\0';
-
+        // here we guess symbol is found in DB for NO_MYSQL mode, so, no actions required, we should
+        // leave symbol variable as is
 #endif        
 
 	} else {
@@ -103,6 +103,21 @@ void db_add_user(YAAMP_DB *db, YAAMP_CLIENT *client)
 	}
 
 	mysql_free_result(result);
+    #else
+        debuglog("user %s %s connected in no_mysql mode\n", client->username, symbol);
+        // now we should attach client to selected coind
+        if (!client->coinid) {
+        for(CLI li = g_list_coind.first; li; li = li->next) {
+            YAAMP_COIND *coind = (YAAMP_COIND *)li->data;
+            // debuglog("user %s testing on coin %s ...\n", client->username, coind->symbol);
+            if (!strcmp(symbol,coind->symbol)) {
+                client->coinid = coind->id;
+                debuglog("new user %s for coin %s\n", client->username, coind->symbol);
+                break;
+            }
+        }
+        }
+
     #endif
 
 	db_check_user_input(symbol);
