@@ -284,7 +284,9 @@ static void client_do_submit(YAAMP_CLIENT *client, YAAMP_JOB *job, YAAMP_JOB_VAL
 
 	if(hash_int <= coin_target)
 	{
+        // adding transactions to block
 		char count_hex[8] = { 0 };
+        // adding tx count after blockheader
 		if (templ->txcount <= 252)
 			sprintf(count_hex, "%02x", templ->txcount & 0xFF);
 		else
@@ -297,7 +299,7 @@ static void client_do_submit(YAAMP_CLIENT *client, YAAMP_JOB *job, YAAMP_JOB_VAL
 			// block header of 88 bytes
 			sprintf(block_hex, "%s8400000008000000%s%s", submitvalues->header_be, count_hex, submitvalues->coinbase);
 		}
-
+        // adding tx data itself
 		vector<string>::const_iterator i;
 		for(i = templ->txdata.begin(); i != templ->txdata.end(); ++i)
 			sprintf(block_hex+strlen(block_hex), "%s", (*i).c_str());
@@ -575,6 +577,8 @@ bool client_submit(YAAMP_CLIENT *client, json_value *json_params)
 		client_submit_error(client, job, 25, "Invalid share", extranonce2, ntime, nonce);
 		return true;
 	}
+
+    /* we will submit block to daemon in client_do_submit only if (hash_int <= coin_target) */
 
 	uint64_t hash_int = get_hash_difficulty(submitvalues.hash_bin);
 	uint64_t user_target = diff_to_target(client->difficulty_actual);
