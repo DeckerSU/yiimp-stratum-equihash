@@ -791,6 +791,16 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
         debuglog("block bits: 0x%08x, diff(block bits): %f\n", bits, dDiff);
         debuglog("share diff: %.3f\n", target_to_diff_equi((uint32_t *)submitvalues.hash_bin));
         debuglog("client diff: %.3f\n", client->difficulty_actual);
+        
+        
+        // templ->nbits is just a 32 char string, like "200f0f0f", so to convert it to diff we should convert it to binary value.
+        char bits_str[5] = { 0 }; 
+        string_be(templ->nbits, bits_str); binlify((unsigned char *)&bits, bits_str);
+        debuglog("templ->nbits: %s %s (0x%08x) diff: %.3f coin_target: %016llx (%016llx)\n",
+                    templ->nbits, bits_str, bits, nbits_to_diff_equi(&bits), decode_compact(templ->nbits), 
+                    (uint64_t)0x0000ffff00000000/nbits_to_diff_equi(&bits));
+
+        //debuglog("coin diff: %.3f\n", nbits_to_diff_equi((uint32_t *)&templ->nbits));
 
         // debuglog("%f\n", target_to_diff_equi((uint32_t *) submitvalues.hash_bin));
         // client_submit_error(client, job, 25, "Decker rejected this :)", extranonce2, ntime, nonce);
