@@ -129,8 +129,6 @@ bool client_subscribe(YAAMP_CLIENT *client, json_value *json_params)
         client->difficulty_actual, client->notify_id, client->extranonce1, client->extranonce2size);
     }
 
-	
-
 	return true;
 }
 
@@ -162,7 +160,7 @@ bool client_validate_user_address(YAAMP_CLIENT *client)
 			if(!coind_can_mine(coind)) continue;
 			if(strlen(g_current_algo->name) && strcmp(g_current_algo->name, coind->algo)) continue;
 			if(coind_validate_user_address(coind, client->username)) {
-				debuglog("new user %s for coin %s\n", client->username, coind->symbol);
+				// debuglog("new user %s for coin %s\n", client->username, coind->symbol);
 				client->coinid = coind->id;
 				// update the db now to prevent addresses conflicts
 				CommonLock(&g_db_mutex);
@@ -287,6 +285,7 @@ bool client_authorize(YAAMP_CLIENT *client, json_value *json_params)
 	client_send_result(client, "true");
 	client_send_difficulty(client, client->difficulty_actual);
 
+    debuglog("[!] job for coinid.%d\n", client->coinid);
 	if(client->jobid_locked)
 		job_send_jobid(client, client->jobid_locked);
 	else
@@ -596,7 +595,7 @@ void *client_thread(void *p)
 		}
 
 		if (g_debuglog_client) {
-			debuglog("client %s %d %s\n", method, client->id_int, client->id_str? client->id_str: "null");
+			debuglog("client %s %d %s coinid.%d\n", method, client->id_int, client->id_str? client->id_str: "null", client->coinid);
 		}
 
 		bool b = false;
