@@ -6,7 +6,9 @@ SQLFLAGS= `mysql_config --cflags --libs`
 
 # Comment this line to disable address check on login,
 # if you use the auto exchange feature...
-# CFLAGS += -DNO_EXCHANGE 
+
+# if NO_EXCHANGE flag exists, user will be able to choose coin (look job_send_last in job_send.cpp)
+CFLAGS += -DNO_EXCHANGE 
 
 # NO_MYSQL flag used to operate in solo mode without DB installed
 CFLAGS += -DNO_MYSQL
