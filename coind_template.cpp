@@ -63,7 +63,9 @@ YAAMP_JOB_TEMPLATE *coind_create_template_memorypool(YAAMP_COIND *coind)
 //	templ->height = json_get_int(json_result, "height");
 	sprintf(templ->version, "%08x", (unsigned int)json_get_int(json_result, "version"));
 	sprintf(templ->ntime, "%08x", (unsigned int)json_get_int(json_result, "time"));
-	strcpy(templ->nbits, json_get_string(json_result, "bits"));
+	
+    strcpy(templ->nbits, json_get_string(json_result, "bits"));
+
 	strcpy(templ->prevhash_hex, json_get_string(json_result, "previousblockhash"));
 
 	json_value_free(json);
@@ -303,11 +305,19 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 
 	const char *bits = json_get_string(json_result, "bits");
 	strcpy(templ->nbits, bits ? bits : "");
+        
 	const char *prev = json_get_string(json_result, "previousblockhash");
 	strcpy(templ->prevhash_hex, prev ? prev : "");
 
     // equihash
     if (!strcmp(g_stratum_algo, "equihash")) {
+
+        /*
+        // (!) bits <- target (?)
+        const char *target = json_get_string(json_result, "target");
+        std::cerr << "[!]" << " target: " << target << std::endl;
+        */
+
         const char *finalsaplingroothash = json_get_string(json_result, "finalsaplingroothash");
         strcpy(templ->extradata_hex, finalsaplingroothash ? finalsaplingroothash : "");
         string_be(templ->extradata_hex,templ->extradata_be);
@@ -507,19 +517,22 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
         {
             std::string mr = merkle_with_first(txsteps, hash_be);
             std::string hex(mr);
-            for (std::string::iterator it=hex.begin(); it != hex.end(); it += 2) std::swap(it[0], it[1]);
-            std::string hex_reversed(hex.rbegin(), hex.rend());
+            //for (std::string::iterator it=hex.begin(); it != hex.end(); it += 2) std::swap(it[0], it[1]);
+            //std::string hex_reversed(hex.rbegin(), hex.rend());
             //std::cerr << hex_reversed << std::endl;
-            strcpy(templ->mr_hex,hex_reversed.c_str());
+            //strcpy(templ->mr_hex,hex_reversed.c_str());
+            strcpy(templ->mr_hex,hex.c_str());
+            std::cerr << "Merkle (many): " << templ->mr_hex << std::endl;
         } else 
         {
             // TODO: don't sure about a case with only one coinbase in blocktemplate,
             // without other txes
             std::string hex(p);
-            std::cerr << "conbase hash: " << p << std::endl;
-            for (std::string::iterator it=hex.begin(); it != hex.end(); it += 2) std::swap(it[0], it[1]);
-            std::string hex_reversed(hex.rbegin(), hex.rend());
+            //std::cerr << "conbase hash: " << p << std::endl;
+            //for (std::string::iterator it=hex.begin(); it != hex.end(); it += 2) std::swap(it[0], it[1]);
+            //std::string hex_reversed(hex.rbegin(), hex.rend());
             strcpy(templ->mr_hex,hex.c_str());
+            std::cerr << "Merkle (one): " << templ->mr_hex << std::endl;
         }
 
         // standart - merkle_arr = txsteps = templ->txmerkles       - // https://github.com/slushpool/poclbm-zcash/wiki/Stratum-protocol-changes-for-ZCash
@@ -595,7 +608,9 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 		templ->txmerkles[strlen(templ->txmerkles)-1] = 0;
 
 	// debuglog("merkle transactions %d [%s]\n", templ->txcount, templ->txmerkles);
-	ser_string_be2(templ->prevhash_hex, templ->prevhash_be, 8);
+    if (!strcmp(g_stratum_algo, "equihash")) {
+        string_be(templ->prevhash_hex, templ->prevhash_be);
+    } else ser_string_be2(templ->prevhash_hex, templ->prevhash_be, 8);
 
 	if(!strcmp(coind->symbol, "LBC"))
 		ser_string_be2(templ->claim_hex, templ->claim_be, 8);
