@@ -751,7 +751,23 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
 	}
 
     // TODO: check equihash solution here and submit a error if it's invalid 
-
+    if (g_current_algo->name && !strcmp(g_current_algo->name,"equihash")) {
+        /*
+        fprintf(stderr,"blockheader:\n");
+        for (int i=0; i<140; i++) {
+            fprintf(stderr,"%02x",submitvalues.header_bin[i] & 0xff);
+        }
+        fprintf(stderr,"\n");
+        */
+        const char *EH_hdr = (char *)submitvalues.header_bin;
+        const char *EH_sln = (char *)submitvalues.header_bin + 143;
+        //std::cerr << "verifyEH - " << verifyEH(EH_hdr, EH_sln) << std::endl;
+        if (!verifyEH(EH_hdr, EH_sln))
+            {
+                client_submit_error(client, job, 25, "Invalid equihash solution", extranonce2, ntime, nonce);
+                return true;
+            }
+    }
 	uint64_t hash_int = get_hash_difficulty(submitvalues.hash_bin);
 	uint64_t user_target = diff_to_target(client->difficulty_actual);
 	uint64_t coin_target = decode_compact(templ->nbits);
