@@ -807,6 +807,9 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
         // return true;
     }
 
+    if (g_current_algo->name && !strcmp(g_current_algo->name,"equihash")) {
+    }
+
     uint64_t hash_int = get_hash_difficulty(submitvalues.hash_bin);
 	uint64_t user_target = diff_to_target(client->difficulty_actual);
 	uint64_t coin_target = decode_compact(templ->nbits);
@@ -837,8 +840,12 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
 		// 4 records are enough per miner
 		if (!client_ask_stats(client)) client->stats = false;
 	}
-
-	double share_diff = diff_to_target(hash_int);
+    
+    double share_diff = 0.0;
+    if (g_current_algo->name && !strcmp(g_current_algo->name,"equihash")) {
+        share_diff = target_to_diff_equi((uint32_t *)submitvalues.hash_bin);
+    } else 
+        share_diff = diff_to_target(hash_int);
 //	if (g_current_algo->diff_multiplier != 0) {
 //		share_diff = share_diff / g_current_algo->diff_multiplier;
 //	}
