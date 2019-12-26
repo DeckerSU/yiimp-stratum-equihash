@@ -806,8 +806,10 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
         diff_to_target_equi((uint32_t *)equi_target, dDiff);  
         hexlify(target_str, equi_target, 32); string_be(target_str, target_str_be);
         
-        debuglog("block bits: 0x%08x, diff(block bits): %f, target(block bits): %s\n", bits, dDiff, target_str_be);
+        debuglog("target(block bits): %s\n", target_str_be);
+        debuglog("block bits: 0x%08x, diff(block bits): %f\n", bits, dDiff);
         debuglog("share diff: %.3f\n", target_to_diff_equi((uint32_t *)submitvalues.hash_bin));
+        debuglog("client diff: %.3f\n", client->difficulty_actual);
 
         // debuglog("%f\n", target_to_diff_equi((uint32_t *) submitvalues.hash_bin));
         // client_submit_error(client, job, 25, "Decker rejected this :)", extranonce2, ntime, nonce);
