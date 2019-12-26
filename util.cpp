@@ -569,6 +569,30 @@ void diff_to_target_equi(uint32_t *target, double diff)
     }
 }
 
+double nbits_to_diff_equi(uint32_t *nbits) {
+    // ported diff calc proc from KMD ... 
+    uint32_t bits = *(nbits);
+    //uint32_t powLimit = UintToArith256(Params().GetConsensus().powLimit).GetCompact(); // 0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f
+    uint32_t powLimit = 0x200f0f0f;
+    int nShift = (bits >> 24) & 0xff;
+    int nShiftAmount = (powLimit >> 24) & 0xff;
+
+    double dDiff =
+        (double)(powLimit & 0x00ffffff) /
+        (double)(bits & 0x00ffffff);
+
+    while (nShift < nShiftAmount)
+    {
+        dDiff *= 256.0;
+        nShift++;
+    }
+    while (nShift > nShiftAmount)
+    {
+        dDiff /= 256.0;
+        nShift--;
+    }
+    return dDiff;
+}
 
 uint64_t decode_compact(const char *input)
 {

@@ -780,28 +780,9 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
         fprintf(stderr,"\n");
         */
         
-        // diff calc from KMD ... 
         uint32_t bits = *((uint32_t *)&submitvalues.header_bin[4 + 32 * 3 + 4]);
-        //uint32_t powLimit = UintToArith256(Params().GetConsensus().powLimit).GetCompact(); // 0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f
-        uint32_t powLimit = 0x200f0f0f;
-        int nShift = (bits >> 24) & 0xff;
-        int nShiftAmount = (powLimit >> 24) & 0xff;
+        double dDiff = nbits_to_diff_equi(&bits);
 
-        double dDiff =
-            (double)(powLimit & 0x00ffffff) /
-            (double)(bits & 0x00ffffff);
-
-        while (nShift < nShiftAmount)
-        {
-            dDiff *= 256.0;
-            nShift++;
-        }
-        while (nShift > nShiftAmount)
-        {
-            dDiff /= 256.0;
-            nShift--;
-        }
-        
         uint8_t equi_target[32] = { 0 }; char target_str[65]; target_str[64] = 0; char target_str_be[65]; target_str_be[64] = 0;
         diff_to_target_equi((uint32_t *)equi_target, dDiff);  
         hexlify(target_str, equi_target, 32); string_be(target_str, target_str_be);

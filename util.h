@@ -102,6 +102,7 @@ double target_to_diff(uint64_t target);
 
 void diff_to_target_equi(uint32_t *target, double diff);
 double target_to_diff_equi(uint32_t* target);
+double nbits_to_diff_equi(uint32_t *nbits);
 
 uint64_t get_hash_difficulty(unsigned char *input);
 
