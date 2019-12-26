@@ -57,7 +57,7 @@ static void job_mining_notify_buffer(YAAMP_JOB *job, char *buffer)
         string_be(templ->version,rev_version);
         string_be(templ->prevhash_hex,prevHashReversed);
         string_be(templ->mr_hex,merkleRootReversed);
-        std::cerr << "Merkle (sent): " << merkleRootReversed << std::endl;
+        //std::cerr << "Merkle (sent): " << merkleRootReversed << std::endl;
         
         //memset(merkleRootReversed, 0x30, 64); merkleRootReversed[65] = 0;
         

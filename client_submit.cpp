@@ -58,27 +58,18 @@ void build_submit_values(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE *tem
 void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE *templ,
 	const char *nonce1, const char *nonce2, const char *ntime, const char *nonce, const char *equi_solution)
 {
-    // debug
+    /*
     std::cerr << "build_submit_values_equi" << std::endl;
     std::cerr << "------------------------" << std::endl;
     std::cerr << "nonce1 = " << nonce1 << std::endl;
     std::cerr << "nonce2 = " << nonce2 << std::endl;
     std::cerr << "ntime = " << ntime << " (" << templ->ntime << ")" << std::endl;
     std::cerr << "nonce = " << nonce << std::endl;
-    //std::cerr << "equi_solution = " << equi_solution << std::endl;
-
-    /*
-    nonce1 = 81000002
-    nonce  = 0000000000000000d404000001000000000000000000000000000000
-    810000020000000000000000d404000001000000000000000000000000000000 - full nonce
     */
 
-    // let's assemble coinbase
-	// sprintf(submitvalues->coinbase, "%s%s%s%s", templ->coinb1, nonce1, nonce2, templ->coinb2);
     sprintf(submitvalues->coinbase, "%s", templ->coinbase);
 	int coinbase_len = strlen(submitvalues->coinbase);
-    //std::cerr << "coinbase[" << coinbase_len << "] = " << submitvalues->coinbase << std::endl;
-    std::cerr << "[2] Txes count: " << templ->txdata.size() << std::endl;
+    //std::cerr << "[2] Txes count: " << templ->txdata.size() << std::endl;
 
 	unsigned char coinbase_bin[1024];
 	memset(coinbase_bin, 0, 1024);
@@ -94,41 +85,14 @@ void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE
 	merkle_hash((char *)coinbase_bin, doublehash, coinbase_len/2);
 
 	string merkleroot = merkle_with_first(templ->txsteps, doublehash);
-	//ser_string_be(merkleroot.c_str(), submitvalues->merkleroot_be, 8);
     strcpy(submitvalues->merkleroot_be, merkleroot.c_str());
-    std::cerr << "Merkle (build): " << merkleroot << std::endl;
+    // std::cerr << "Merkle (build): " << merkleroot << std::endl;
 
 #ifdef MERKLE_DEBUGLOG
 	printf("merkle root %s\n", merkleroot.c_str());
 #endif
 
-    // TODO: create a correct equihash blockheader
-    /*
-        var header =  new Buffer(140);
-        var position = 0;
-
-        header.writeUInt32LE(this.rpcData.version, position += 0, 4, 'hex');
-        header.write(this.prevHashReversed, position += 4, 32, 'hex');
-        header.write(this.merkleRootReversed, position += 32, 32, 'hex');
-        header.write(this.hashReserved, position += 32, 32, 'hex'); 
-        header.write(nTime, position += 32, 4, 'hex');
-        header.write(util.reverseBuffer(new Buffer(rpcData.bits, 'hex')).toString('hex'), position += 4, 4, 'hex');
-        header.write(nonce, position += 4, 32, 'hex');
-
-        CBlockHeader
-        READWRITE(this->nVersion);
-        READWRITE(hashPrevBlock);
-        READWRITE(hashMerkleRoot);
-        READWRITE(hashFinalSaplingRoot);
-        READWRITE(nTime);
-        READWRITE(nBits);
-        READWRITE(nNonce);
-        READWRITE(nSolution);
-
-    */  
-
     {
-        
         char rev_version[32] = {0};
         char rev_ntime[32] = {0};
         char rev_nbits[32] = {0};
@@ -137,56 +101,25 @@ void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE
         //string_be(templ->ntime,rev_ntime);
         string_be(templ->nbits,rev_nbits);
 
-        /*
-        char rev_nonce1[9] = {0};
-        char rev_nonce[65] = {0};
-        string_be(nonce1, rev_nonce1);
-        string_be(nonce, rev_nonce);
-        */
-
-        // full nonce[32] = nonce1[4] + nonce[from miner]
-        // nonce1 - given to a miner by pool
-        // nonce  - come from miner
-
-        std::cerr << "[!] nonceN = " << nonce1 << nonce << std::endl;
-        //std::cerr << "[!] nonceR = " << rev_nonce << rev_nonce1 << std::endl;
-        /*
         sprintf(submitvalues->header, "%s%s%s%s%s%s%s%s%s", rev_version, templ->prevhash_be, submitvalues->merkleroot_be,
             templ->extradata_be, rev_ntime, rev_nbits, nonce1, nonce, equi_solution);
-        */
-        sprintf(submitvalues->header, "%s%s%s%s%s%s%s%s%s", rev_version, templ->prevhash_be, submitvalues->merkleroot_be,
-            templ->extradata_be, rev_ntime, rev_nbits, nonce1, nonce, equi_solution);
-        std::cerr << " header: " << submitvalues->header << std::endl;
-        //std::cerr << "strlen(submitvalues->header) = " << strlen(submitvalues->header) << std::endl;
-        //ser_string_be(submitvalues->header, submitvalues->header_be, 20); // 20? 
+        //std::cerr << " header: " << submitvalues->header << std::endl;
 
         memset(submitvalues->header_be, 0, EQUI_HEADER_SIZE * 2 + 1);
         strcpy(submitvalues->header_be,submitvalues->header);
-        
-        //std::cerr << "submitvalues->header    = " << submitvalues->header << std::endl;
-        //std::cerr << "submitvalues->header_be = " << submitvalues->header_be << std::endl;
-
-        
-
-        // btc header - 80 
-        // zec/kmd header - 4+32+32+32+4+4+32 = 140 
-        // zec/kmd header + sol - 4+32+32+32+4+4+32 + 1344 + 3 = 1487
-
+ 
 	}
 
 	binlify(submitvalues->header_bin, submitvalues->header_be);
 
-    // std::cerr << "blockheader: " << submitvalues->header_be << std::endl;
-
-    //	printf("%s\n", submitvalues->header_be);
 	int header_len = strlen(submitvalues->header)/2;
 	g_current_algo->hash_function((char *)submitvalues->header_bin, (char *)submitvalues->hash_bin, header_len);
     
 
 	hexlify(submitvalues->hash_hex, submitvalues->hash_bin, 32);
 	string_be(submitvalues->hash_hex, submitvalues->hash_be);
-    std::cerr << "  blockhash: " << submitvalues->hash_be << std::endl;
-    //std::cerr << "   verifyEH: " << verifyEH((const char *)submitvalues->header_bin, (const char *)&submitvalues->header_bin[140 + 3]) << std::endl;
+	//std::cerr << "  blockhash: " << submitvalues->hash_be << std::endl;
+    debuglog("blockhash: %s\n",submitvalues->hash_be);
 }
 /////////////////////////////////////////////
 
@@ -383,7 +316,7 @@ static void client_do_submit(YAAMP_CLIENT *client, YAAMP_JOB *job, YAAMP_JOB_VAL
 				snprintf(block_hex, block_size, "%s", hex);
 		}
 
-        std::cerr << "Block hex: " << block_hex << std::endl;
+		// std::cerr << "Block hex: " << block_hex << std::endl;
 		bool b = coind_submit(coind, block_hex);
 		if(b)
 		{
@@ -702,21 +635,10 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
 		return false;
 	}
 
-    // debug
+    /*
     for (int i = 0; i < json_params->u.array.length - 1; i++) {
         std::cerr << "[" << i << "] " << json_params->u.array.values[i]->u.string.ptr << std::endl;
     }
-    /*
-        [0] RTcq51jkXENgvmpo4tzRtRuTxMbdrdwsJY - address (wallet)
-        [1] 1 -jobid (?)
-        [2] 0d6e035e
-        [3] 0000000000000000d7b3000002000000000000000000000000000000
-            0000000000000000ea35000001000000
-            0000000000000000ea35000001000000000000000000000000000000
-            0000000000000000452e000001000000000000000000000000000000
-        [4] equihash solution
-
-        pool->user, jobid, timehex, noncestr, solhex
     */
 
 	char extranonce2[32] = { 0 };
@@ -808,29 +730,11 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
 		return true;
 	}
 
-    /*
-    // extranonce2 is absent in equihash
-	if(strlen(extranonce2) != client->extranonce2size*2)
-	{
-		client_submit_error(client, job, 24, "Invalid extranonce2 size", extranonce2, ntime, nonce);
-		return true;
-	}
-    */
-
-    /*
-	// check if the submitted extranonce is valid
-	if(!ishexa(extranonce2, client->extranonce2size*2)) {
-		client_submit_error(client, job, 27, "Invalid nonce2", extranonce2, ntime, nonce);
-		return true;
-	}
-    */
-
 	///////////////////////////////////////////////////////////////////////////////////////////
 
-    std::cerr << "height: " << templ->height << std::endl;
+    //std::cerr << "height: " << templ->height << std::endl;
 	YAAMP_JOB_VALUES submitvalues;
 	memset(&submitvalues, 0, sizeof(submitvalues));
-	// (!!!)
     build_submit_values_equi(&submitvalues, templ, client->extranonce1, extranonce2, ntime, nonce, equi_solution);
 
 	// minimum hash diff begins with 0000, for all...
@@ -845,6 +749,8 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
 		client_submit_error(client, job, 25, "Invalid share", extranonce2, ntime, nonce);
 		return true;
 	}
+
+    // TODO: check equihash solution here and submit a error if it's invalid 
 
 	uint64_t hash_int = get_hash_difficulty(submitvalues.hash_bin);
 	uint64_t user_target = diff_to_target(client->difficulty_actual);

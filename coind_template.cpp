@@ -455,7 +455,7 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 		}
 	}
     
-    std::cerr << "[1] Txes count: " << templ->txdata.size() << std::endl;
+    // std::cerr << "[1] Txes count: " << templ->txdata.size() << std::endl;
 
     // for equihash we need to insert coinbasetxn here
     if (!strcmp(g_stratum_algo, "equihash")) {
@@ -521,34 +521,19 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
             std::string hex_reversed(hex.rbegin(), hex.rend());
             std::cerr << hex_reversed << std::endl;
             strcpy(templ->mr_hex,hex_reversed.c_str());
-            //strcpy(templ->mr_hex,hex.c_str());
-            std::cerr << "Merkle (many): " << templ->mr_hex << std::endl;
+            //std::cerr << "Merkle (many): " << templ->mr_hex << std::endl;
         } else 
         {
-            // TODO: don't sure about a case with only one coinbase in blocktemplate,
-            // without other txes
             std::string hex(p);
-            //std::cerr << "conbase hash: " << p << std::endl;
-            //for (std::string::iterator it=hex.begin(); it != hex.end(); it += 2) std::swap(it[0], it[1]);
-            //std::string hex_reversed(hex.rbegin(), hex.rend());
             strcpy(templ->mr_hex,hex.c_str());
-            std::cerr << "Merkle (one): " << templ->mr_hex << std::endl;
+            //std::cerr << "Merkle (one): " << templ->mr_hex << std::endl;
         }
 
+        /*
         // standart - merkle_arr = txsteps = templ->txmerkles       - // https://github.com/slushpool/poclbm-zcash/wiki/Stratum-protocol-changes-for-ZCash
         // equishash - merkle_arr->merkleroot (including coinbase)  - // https://en.bitcoin.it/wiki/Stratum_mining_protocol#mining.notify
-
-        /*
-
-        4cdfc3b122d2513988817361c31734e7ebc597f9f78e90294722c97e9a0bece9
-
-        [1] "a9e27225d809d08f2bd17e03d4e0b8d63c9f1d9da7196585b017cea9586a97b1" b1976a58a9ce17b0856519a79d1d9f3cd6b8e0d4037ed12b8fd009d82572e2a9
-        [2] "03889a9f0e45c74a44f8872c971164582693e76511a37fe8df7d093c4024d3f2" f2d324403c097ddfe87fa31165e79326586411972c87f8444ac7450e9f9a8803
-        [3] "9371d068ace5130e7a8ce8e80c0d9448bb3b97b581c0285ba7d04d27e4660411" 110466e4274dd0a75b28c081b5973bbb48940d0ce8e88c7a0e13e5ac68d07193
-
         https://en.bitcoin.it/wiki/Stratum_mining_protocol#mining.notify
         List of merkle branches. The generation transaction is hashed against the merkle branches to build the final merkle root.
-
         */
     }
 
