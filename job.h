@@ -46,6 +46,7 @@ struct YAAMP_JOB_TEMPLATE
 
 	char version[32];
 	char nbits[32];
+    char nbits_from_target[32];
 	char ntime[32];
 
 	int height;
