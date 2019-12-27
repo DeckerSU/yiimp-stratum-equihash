@@ -794,8 +794,16 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
         diff_to_target_equi((uint32_t *)equi_target, client->difficulty_actual);
         hexlify(target_str, equi_target, 32); string_be(target_str, target_str_be);
         if (g_debuglog_hash) {
-            debuglog("blockhash: %s\n", submitvalues.hash_be);
-            debuglog("   target: %s\n", target_str_be);
+            debuglog(" blockhash: %s\n", submitvalues.hash_be);
+            debuglog("loc target: %s\n", target_str_be);
+            
+            uint32_t tmp_bits; char tmp_bits_str[5]; char tmp_target[65];
+            string_be(templ->nbits, tmp_bits_str); binlify((unsigned char *)&tmp_bits, tmp_bits_str);
+            bits2target(tmp_bits, tmp_target); tmp_target[64] = '\0';
+            debuglog("net target: %s\n", tmp_target);
+            string_be(templ->nbits_from_target, tmp_bits_str); binlify((unsigned char *)&tmp_bits, tmp_bits_str);
+            bits2target(tmp_bits, tmp_target); tmp_target[64] = '\0';
+            debuglog("--- target: %s\n", tmp_target);
 
             debuglog(" share diff: %.3f\n", target_to_diff_equi((uint32_t *)submitvalues.hash_bin));
             debuglog("client diff: %.3f\n", client->difficulty_actual);
