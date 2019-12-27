@@ -44,7 +44,9 @@ Currently app is in developement state (!), it able to receive `getblocktemplate
 
 - MORTY block [#215488](https://morty.kmd.dev/block/000179a65539ff4d4f358f05306b1d715293f01581fb959ecaa4894b1038829b) `000179a65539ff4d4f358f05306b1d715293f01581fb959ecaa4894b1038829b`
 
-![MORTY block #215488](./images/morty-block-01.png?raw=true "MORTY block #215488")
+![MORTY block #215488](./images/morty-block-01.png "MORTY block #215488")
+
+![STRATUM block #319](./images/morty-block-02.png "STRATUM block #319")
 
 ### Donate
 
