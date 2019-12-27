@@ -314,10 +314,19 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 
         /*
         // (!) bits <- target (?)
-        const char *target = json_get_string(json_result, "target");
-        std::cerr << "[!]" << " target: " << target << std::endl;
+        // https://bitcoin.stackexchange.com/questions/30467/what-are-the-equations-to-convert-between-bits-and-difficulty
+        
         */
 
+        // override nbits from target
+        /*
+        const char *target = json_get_string(json_result, "target");
+        uint32_t bits_bin = target2bits(target); // bits_bin = 0x1e3a79c3, templ->nbits = "1e3a79c3"
+        char bits_str[5] = {0};
+        hexlify(bits_str, (const unsigned char *)&bits_bin, 4);
+        string_be(bits_str, templ->nbits);
+        */
+       
         const char *finalsaplingroothash = json_get_string(json_result, "finalsaplingroothash");
         strcpy(templ->extradata_hex, finalsaplingroothash ? finalsaplingroothash : "");
         string_be(templ->extradata_hex,templ->extradata_be);
