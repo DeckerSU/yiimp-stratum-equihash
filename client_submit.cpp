@@ -215,7 +215,7 @@ static void client_do_submit(YAAMP_CLIENT *client, YAAMP_JOB *job, YAAMP_JOB_VAL
     if (g_current_algo->name && !strcmp(g_current_algo->name,"equihash")) 
         {
             uint32_t bits; char bits_str[5] = { 0 }; 
-            string_be(templ->nbits, bits_str); binlify((unsigned char *)&bits, bits_str);
+            string_be(templ->nbits/*_from_target*/, bits_str); binlify((unsigned char *)&bits, bits_str);
             hash_int    = diff_to_target(target_to_diff_equi((uint32_t *)submitvalues->hash_bin));
             coin_target = diff_to_target(nbits_to_diff_equi(&bits));
         }
