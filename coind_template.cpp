@@ -672,9 +672,21 @@ bool coind_create_job(YAAMP_COIND *coind, bool force)
 			stratumlog("%s %d not reporting\n", coind->name, coind->height);
 	}
 
-	uint64_t coin_target = decode_compact(templ->nbits);
-	if (templ->nbits && !coin_target) coin_target = 0xFFFF000000000000ULL; // under decode_compact min diff
+	uint64_t coin_target;
+    if (g_current_algo->name && !strcmp(g_current_algo->name,"equihash"))
+        {
+            uint32_t bits;
+            char bits_str[5] = { 0 }; 
+            string_be(templ->nbits, bits_str); binlify((unsigned char *)&bits, bits_str);
+            coin_target = diff_to_target(nbits_to_diff_equi(&bits));
+        }
+    else
+        {
+            coin_target  = decode_compact(templ->nbits);
+        };
     
+	if (templ->nbits && !coin_target) coin_target = 0xFFFF000000000000ULL; // under decode_compact min diff
+
 	coind->difficulty = target_to_diff(coin_target);
 
 	stratumlog("%s %d diff %g %llx %s\n", coind->name, height, coind->difficulty, coin_target, templ->nbits);
