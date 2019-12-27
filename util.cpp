@@ -528,7 +528,7 @@ double target_to_diff(uint64_t target)
 }
 
 void bits2target(uint32_t nbits, char *out_target) {
-    // nb! out_target space should be prepared before call (!)
+    // nb! out_target space should be prepared before call, last 65th 0x00 char should be inserted by caller?
     char out_target_bin[32];
     char out_target_rev[65]; 
     memset(out_target_bin, 0, 32);
@@ -546,42 +546,6 @@ uint32_t target2bits(const char *target) {
     // bits -> target
     // https://bitcoin.stackexchange.com/questions/30467/what-are-the-equations-to-convert-between-bits-and-difficulty
     // https://github.com/yqsy/notes/blob/58cd486426e474157ac8ef1c17a934d25401b8f1/business/blockchain/bitcoin/%E7%A5%9E%E5%A5%87%E7%9A%84nBits.md
-
-    /*
-    /*
-    Hexadecimal representation like 0x182815ee consists of two parts:
-    0x18 -- number of bytes in a target
-    0x2815ee -- target prefix
-    This means that valid hash should be less than 0x2815ee000000000000000000000000000000000000000000 (it is exactly 0x18 = 24 bytes long).
-
-        "target": "000000000076deef000000000000000000000000000000000000000000000000",
-        "bits": "1b76deef",
-        000000000076deef000000000000000000000000000000000000000000000000 - 32 bytes (64 ascii)
-                  76deef000000000000000000000000000000000000000000000000 - 27 bytes (54 ascii)
-        0x1b = 27 (dec)
-    */
-    /*
-    void bits2target(uint32_t nbits, unsigned char *target) {
-        int i;
-        memset(target, 0, 32);
-
-        if (nbits !=0) {
-        target[(nbits >> 24)-1] = (nbits >> 16) & 0xff;
-        target[(nbits >> 24)-2] = (nbits >> 8) & 0xff;
-        target[(nbits >> 24)-3] = nbits & 0xff;
-        }
-        //printf("target: "); for (i=0; i<32; i++) printf("%02x", target[31-i]); printf("\n");
-        //printf("target: 000000000076deef000000000000000000000000000000000000000000000000\n");
-    }
-    */
-
-    // target to bits
-    // const char *target = "000000000076deef000000000000000000000000000000000000000000000000"; // 0x1b76deef // 27 bytes, 215 bits (26 * 8 = 208 + 7 = 215 bits)
-    // const char *target = "0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f"; // 0x2f0f0f0f
-    // const char *target = "000000000176deef000000000000000000000000000000000000000000000000"; // 0x1c0176de
-    // const char *target =  "000000000000000000000000000000000000000000000000000000000000dead"; // 0x0300dead
-    // const char *target =    "0000000000000000000000000000000000000000000000000000000000ffdead"; // 0x0400ffde
-    // cout << "0x" << std::hex << std::setw(8) << std::setfill('0') << target2bits(target) << endl;
 
     // derived from target -> bits (GetCompact() in bitcoin/src/arith_uint256.cpp)
     char target_rev[65] = {0}; string_be(target, target_rev);
