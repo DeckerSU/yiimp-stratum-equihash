@@ -119,7 +119,7 @@ void build_submit_values_equi(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE
 	hexlify(submitvalues->hash_hex, submitvalues->hash_bin, 32);
 	string_be(submitvalues->hash_hex, submitvalues->hash_be);
 	//std::cerr << "  blockhash: " << submitvalues->hash_be << std::endl;
-    debuglog("blockhash: %s\n",submitvalues->hash_be);
+    //debuglog("blockhash: %s\n",submitvalues->hash_be);
 }
 /////////////////////////////////////////////
 
@@ -578,8 +578,6 @@ bool client_submit(YAAMP_CLIENT *client, json_value *json_params)
 		return true;
 	}
 
-    /* we will submit block to daemon in client_do_submit only if (hash_int <= coin_target) */
-
 	uint64_t hash_int = get_hash_difficulty(submitvalues.hash_bin);
 	uint64_t user_target = diff_to_target(client->difficulty_actual);
 	uint64_t coin_target = decode_compact(templ->nbits);
@@ -772,52 +770,40 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
                 return true;
             }
     }
-	
-    // TODO: implement equihash diff calculation
-    if (g_current_algo->name && !strcmp(g_current_algo->name,"equihash")) {
-        
-        /*
-        fprintf(stderr,"submitvalues.hash_bin:\n");
-        for (int i=31; i>=0; i--) {
-            fprintf(stderr,"%02x",submitvalues.hash_bin[i] & 0xff);
-        }
-        fprintf(stderr,"\n");
-        */
-        
-        uint32_t bits = *((uint32_t *)&submitvalues.header_bin[4 + 32 * 3 + 4]);
-        double dDiff = nbits_to_diff_equi(&bits);
 
+    uint64_t hash_int, user_target, coin_target;
+
+    /* we will submit block to daemon in client_do_submit only if (hash_int <= coin_target) */
+    if (g_current_algo->name && !strcmp(g_current_algo->name,"equihash")) 
+        {
+        
+        uint32_t bits;
         uint8_t equi_target[32] = { 0 }; char target_str[65]; target_str[64] = 0; char target_str_be[65]; target_str_be[64] = 0;
-        diff_to_target_equi((uint32_t *)equi_target, dDiff);  
+        diff_to_target_equi((uint32_t *)equi_target, client->difficulty_actual);
         hexlify(target_str, equi_target, 32); string_be(target_str, target_str_be);
-        
-        debuglog("target(block bits): %s\n", target_str_be);
-        debuglog("block bits: 0x%08x, diff(block bits): %f\n", bits, dDiff);
-        debuglog("share diff: %.3f\n", target_to_diff_equi((uint32_t *)submitvalues.hash_bin));
+        debuglog("blockhash: %s\n", submitvalues.hash_be);
+        debuglog("   target: %s\n", target_str_be);
+
+        debuglog(" share diff: %.3f\n", target_to_diff_equi((uint32_t *)submitvalues.hash_bin));
         debuglog("client diff: %.3f\n", client->difficulty_actual);
-        
         
         // templ->nbits is just a 32 char string, like "200f0f0f", so to convert it to diff we should convert it to binary value.
         char bits_str[5] = { 0 }; 
         string_be(templ->nbits, bits_str); binlify((unsigned char *)&bits, bits_str);
-        debuglog("templ->nbits: %s %s (0x%08x) diff: %.3f coin_target: %016llx (%016llx)\n",
-                    templ->nbits, bits_str, bits, nbits_to_diff_equi(&bits), decode_compact(templ->nbits), 
-                    (uint64_t)0x0000ffff00000000/nbits_to_diff_equi(&bits));
+        debuglog("  coin diff: %.3f\n", nbits_to_diff_equi(&bits));
 
-        //debuglog("coin diff: %.3f\n", nbits_to_diff_equi((uint32_t *)&templ->nbits));
-
-        // debuglog("%f\n", target_to_diff_equi((uint32_t *) submitvalues.hash_bin));
-        // client_submit_error(client, job, 25, "Decker rejected this :)", extranonce2, ntime, nonce);
-        // return true;
-    }
-
-    if (g_current_algo->name && !strcmp(g_current_algo->name,"equihash")) {
-    }
-
-    uint64_t hash_int = get_hash_difficulty(submitvalues.hash_bin);
-	uint64_t user_target = diff_to_target(client->difficulty_actual);
-	uint64_t coin_target = decode_compact(templ->nbits);
-
+        // so, let's convert double diff values to corresponding uint64_t
+        hash_int    = diff_to_target(target_to_diff_equi((uint32_t *)submitvalues.hash_bin));
+        user_target = diff_to_target(client->difficulty_actual);
+        coin_target = diff_to_target(nbits_to_diff_equi(&bits));
+        } 
+    else
+        {
+        hash_int    = get_hash_difficulty(submitvalues.hash_bin);
+        user_target = diff_to_target(client->difficulty_actual);
+        coin_target = decode_compact(templ->nbits);
+        }
+    
 	if (templ->nbits && !coin_target) coin_target = 0xFFFF000000000000ULL;
 
 	if (g_debuglog_hash) {
@@ -825,6 +811,7 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
 		debuglog("%016llx target\n", user_target);
 		debuglog("%016llx coin\n", coin_target);
 	}
+
 	if(hash_int > user_target && hash_int > coin_target)
 	{
 		client_submit_error(client, job, 26, "Low difficulty share", extranonce2, ntime, nonce);
