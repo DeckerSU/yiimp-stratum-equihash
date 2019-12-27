@@ -793,16 +793,18 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
         uint8_t equi_target[32] = { 0 }; char target_str[65]; target_str[64] = 0; char target_str_be[65]; target_str_be[64] = 0;
         diff_to_target_equi((uint32_t *)equi_target, client->difficulty_actual);
         hexlify(target_str, equi_target, 32); string_be(target_str, target_str_be);
-        debuglog("blockhash: %s\n", submitvalues.hash_be);
-        debuglog("   target: %s\n", target_str_be);
+        if (g_debuglog_hash) {
+            debuglog("blockhash: %s\n", submitvalues.hash_be);
+            debuglog("   target: %s\n", target_str_be);
 
-        debuglog(" share diff: %.3f\n", target_to_diff_equi((uint32_t *)submitvalues.hash_bin));
-        debuglog("client diff: %.3f\n", client->difficulty_actual);
-        
+            debuglog(" share diff: %.3f\n", target_to_diff_equi((uint32_t *)submitvalues.hash_bin));
+            debuglog("client diff: %.3f\n", client->difficulty_actual);
+        }
         // templ->nbits is just a 32 char string, like "200f0f0f", so to convert it to diff we should convert it to binary value.
         char bits_str[5] = { 0 }; 
         string_be(templ->nbits, bits_str); binlify((unsigned char *)&bits, bits_str);
-        debuglog("  coin diff: %.3f\n", nbits_to_diff_equi(&bits));
+
+        if (g_debuglog_hash) debuglog("  coin diff: %.3f\n", nbits_to_diff_equi(&bits));
 
         // so, let's convert double diff values to corresponding uint64_t
         hash_int    = diff_to_target(target_to_diff_equi((uint32_t *)submitvalues.hash_bin));
