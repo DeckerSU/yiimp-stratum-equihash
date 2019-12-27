@@ -211,8 +211,20 @@ static void client_do_submit(YAAMP_CLIENT *client, YAAMP_JOB *job, YAAMP_JOB_VAL
 	if(job->block_found) return;
 	if(job->deleted) return;
 
-	uint64_t hash_int = get_hash_difficulty(submitvalues->hash_bin);
-	uint64_t coin_target = decode_compact(templ->nbits);
+    uint64_t hash_int, coin_target;
+    if (g_current_algo->name && !strcmp(g_current_algo->name,"equihash")) 
+        {
+            uint32_t bits; char bits_str[5] = { 0 }; 
+            string_be(templ->nbits, bits_str); binlify((unsigned char *)&bits, bits_str);
+            hash_int    = diff_to_target(target_to_diff_equi((uint32_t *)submitvalues->hash_bin));
+            coin_target = diff_to_target(nbits_to_diff_equi(&bits));
+        }
+    else
+        {
+            hash_int = get_hash_difficulty(submitvalues->hash_bin);
+	        coin_target = decode_compact(templ->nbits);
+        };
+	
 	if (templ->nbits && !coin_target) coin_target = 0xFFFF000000000000ULL;
 
 	int block_size = YAAMP_SMALLBUFSIZE;
