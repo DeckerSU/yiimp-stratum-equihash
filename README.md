@@ -29,6 +29,10 @@ Currently app is in developement state (!), it able to receive `getblocktemplate
 
     Compile it with `NO_MYSQL` flag as mentioned above, then place your `equihash.conf` in same directory with `stratum` binary and start it like `./stratum equihash`. Don't forget to fill coins array in `db.cpp` for solo mode.
 
+- Where exactly should i fill coins array for local mode?
+
+    https://github.com/DeckerSU/yiimp-stratum-equihash/blob/ad5028798aac0be059a37e6afa8b6071544a6aa4/db.cpp#L230 - here. Also, don't forget to change `NUM_COINS` if you plan to add more than one coin.
+
 ### Useful docs
 
 - https://en.bitcoin.it/wiki/Stratum_mining_protocol
