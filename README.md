@@ -36,6 +36,11 @@ Currently app is in developement state (!), it able to receive `getblocktemplate
 - https://github.com/yqsy/notes/blob/58cd486426e474157ac8ef1c17a934d25401b8f1/business/blockchain/bitcoin/%E7%A5%9E%E5%A5%87%E7%9A%84nBits.md
 - https://bitcoin.stackexchange.com/questions/30467/what-are-the-equations-to-convert-between-bits-and-difficulty
 
+### Example of work
+
+- MORTY block [#215488](https://morty.kmd.dev/block/000179a65539ff4d4f358f05306b1d715293f01581fb959ecaa4894b1038829b) `000179a65539ff4d4f358f05306b1d715293f01581fb959ecaa4894b1038829b`
+
+![MORTY block #215488](./images/morty-block-01.png?raw=true "MORTY block #215488")
 
 ### Donate
 
