@@ -4,14 +4,14 @@ Long-awaited implementation of equihash (200.9) protocol for [Yiimp](https://git
 
 Currently app is in developement state (!), it able to receive `getblocktemplate` from daemons, broadcast job to miners, accept and validate solutions, ~~but it still not able to acquire current network diff to determine when accepted share is a block and when it should be send via `submitblock` to daemon~~. Work in progress, so, follow the updates.
 
-Features:
+### Features
 
 - Equihash 200.9 support with validating solutions via `verifyEH` function.
 - Support of so-called "local mode", which allows stratum binary work without Yiimp installed. In this mode it don't need yimmp mysql database and acts as a proxy between daemon `getblocktemplate` and stratum protocol for miners. To enable this mode use `CFLAGS += -DNO_MYSQL` flag in `Makefile`. Coin daemons credentials should be hardcoded in `coins_data[NUM_COINS][NUM_PARAMS]` array in `db.cpp`.
 - Supporting of selecting coins via pass `-c=` param in password field in local (non mysql mode).
 - Sapling compatible. This implementation of stratum don't construct coinbase tx by itself, instead of that it simply copies coinbase given by daemon in `coinbasetxn` field of `getblocktemplate`. So, if coin has sapling active coinbase tx will be with version 4 and needed `versiongroupid` set.
 
-Small Q/A:
+### Small Q/A
 
 - How can i enable additional logging to see blockhashes, diffs, etc.?
 
@@ -29,19 +29,22 @@ Small Q/A:
 
     Compile it with `NO_MYSQL` flag as mentioned above, then place your `equihash.conf` in same directory with `stratum` binary and start it like `./stratum equihash`. Don't forget to fill coins array in `db.cpp` for solo mode.
 
-Useful docs:
+### Useful docs
 
 - https://en.bitcoin.it/wiki/Stratum_mining_protocol
 - https://github.com/slushpool/poclbm-zcash/wiki/Stratum-protocol-changes-for-ZCash
 
-Donate:
+### Donate
 
-If you would like to support this project developement, you can simply do it by send some KMD or assetchains on `RHNSpVd5T6efj98CioNQHGLcfAZ6qecnQ6`.
+If you would like to support this project developement, you can simply do it by send some [KMD](https://komodoplatform.com/) or [assetchains](https://blog.komodoplatform.com/komodo-platform-why-assetchains-part-01-164325398efa) on `RHNSpVd5T6efj98CioNQHGLcfAZ6qecnQ6`.
 
-Credits:
+### Credits
 
 - @tpruvot author of Yiimp pool and base of this stratum implementation.
 
-*NB!* This is beta software, use it on your own risk!
+### Warnings
+
+- This is beta software, use it on your own risk!
+
 
 
