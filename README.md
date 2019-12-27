@@ -33,6 +33,9 @@ Currently app is in developement state (!), it able to receive `getblocktemplate
 
 - https://en.bitcoin.it/wiki/Stratum_mining_protocol
 - https://github.com/slushpool/poclbm-zcash/wiki/Stratum-protocol-changes-for-ZCash
+- https://github.com/yqsy/notes/blob/58cd486426e474157ac8ef1c17a934d25401b8f1/business/blockchain/bitcoin/%E7%A5%9E%E5%A5%87%E7%9A%84nBits.md
+- https://bitcoin.stackexchange.com/questions/30467/what-are-the-equations-to-convert-between-bits-and-difficulty
+
 
 ### Donate
 
