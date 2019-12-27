@@ -527,6 +527,21 @@ double target_to_diff(uint64_t target)
 	return d;
 }
 
+void bits2target(uint32_t nbits, char *out_target) {
+    // nb! out_target space should be prepared before call (!)
+    char out_target_bin[32];
+    char out_target_rev[65]; 
+    memset(out_target_bin, 0, 32);
+    if (nbits !=0) {
+        out_target_bin[(nbits >> 24)-1] = (nbits >> 16) & 0xff;
+        out_target_bin[(nbits >> 24)-2] = (nbits >> 8) & 0xff;
+        out_target_bin[(nbits >> 24)-3] = nbits & 0xff;
+    }
+    hexlify(out_target_rev, (const unsigned char *)out_target_bin, 32);
+    string_be(out_target_rev, out_target);
+    //cout << out_target << endl;
+}
+
 uint32_t target2bits(const char *target) {
     // bits -> target
     // https://bitcoin.stackexchange.com/questions/30467/what-are-the-equations-to-convert-between-bits-and-difficulty
