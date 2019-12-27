@@ -100,6 +100,7 @@ uint64_t decode_compact(const char *input);
 uint64_t diff_to_target(double difficulty);
 double target_to_diff(uint64_t target);
 
+uint32_t target2bits(const char *target);
 void diff_to_target_equi(uint32_t *target, double diff);
 double target_to_diff_equi(uint32_t* target);
 double nbits_to_diff_equi(uint32_t *nbits);
