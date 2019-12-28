@@ -116,6 +116,22 @@ bool coind_validate_address(YAAMP_COIND *coind)
 
 	json_value *json;
 	bool getaddressinfo = ((strcmp(coind->symbol,"DGB") == 0) || (strcmp(coind->symbol2, "DGB") == 0));
+
+    // BTC 0.18.x also should use getaddressinfo, bcz validateaddress haven't field "ismine"
+    if (strcmp(coind->symbol,"BTC") == 0) {
+        json = rpc_call(&coind->rpc, "getnetworkinfo", "[]");
+        if(!json) return false;
+        json_value *json_result = json_get_object(json, "result");
+        if(!json_result)
+        {
+            json_value_free(json);
+            return false;
+        }
+        int btc_version = json_get_int(json_result, "version");
+        if (btc_version >= 180100) getaddressinfo = 1;
+    }
+
+
 	if(getaddressinfo)
 		json = rpc_call(&coind->rpc, "getaddressinfo", params);
 	else
