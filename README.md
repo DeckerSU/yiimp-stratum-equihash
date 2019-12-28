@@ -33,6 +33,38 @@ Currently app is in developement state (!), it able to receive `getblocktemplate
 
     https://github.com/DeckerSU/yiimp-stratum-equihash/blob/ad5028798aac0be059a37e6afa8b6071544a6aa4/db.cpp#L230 - here. Also, don't forget to change `NUM_COINS` if you plan to add more than one coin.
 
+### Other
+
+This implementation have two non-documented options, see the line: https://github.com/DeckerSU/yiimp-stratum-equihash/blob/f9e5c48d8e018f4873683883224bfaffad8f50d8/client_submit.cpp#L218
+
+1. With `templ->nbits` stratum will send block to daemon when `share_hash <= net_target` , where net target is calculated from `nbits` received in `getblocktemplate`. 
+2. With `templ->nbits_from_target` stratum will send block to daemon when `share_hash <= net_target` also, but `net_target` here will be exactly match `target` from `getblocktemplate` .
+
+Both options are worked as expected.
+
+Let's try to understand it on a small example:
+
+```
+04:32:47:  blockhash: 00635db56f0646cedc5091103390b60e30196e9f2d729646c7a11c536ef75d7f
+04:32:47: loc target: 007fff80ffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+04:32:47: net target: 0000459fba000000000000000000000000000000000000000000000000000000
+04:32:47: --- target: 0071a00000000000000000000000000000000000000000000000000000000000
+04:32:47:  share diff: 2.576
+04:32:47: client diff: 2.000
+04:32:47:   coin diff: 14174.652
+04:32:47: 0000635db56f0000 actual
+04:32:47: 00007fff80000000 target
+04:32:47: 000000049f96bf04 coin
+```
+
+We received a block candidate from client with hash `00635db56f0646cedc5091103390b60e30196e9f2d729646c7a11c536ef75d7f` . If we will use **(1)** (see above) this hash will be compared with `net target` (which matches `nbist` in `getblocktemplate`) and if `hash <= net target` it will be send to daemon. If we will use **(2)**, int this case hash will be compared with `--- target`, which matches `target` field in `getblocktemplate`. So, options above affects on with which target will be compared block candidate received from miner to determine what is it share or block.
+
+In this example:
+
+- (1) `00635db56` vs. `0000459f` (target from `gbt.nbist`)
+- (2) `00635db56` vs. `0071a000` (target from `gbt.target`)
+
+
 ### Useful docs
 
 - https://en.bitcoin.it/wiki/Stratum_mining_protocol
