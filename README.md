@@ -33,7 +33,7 @@ Currently app is in developement state (!), it able to receive `getblocktemplate
 
     https://github.com/DeckerSU/yiimp-stratum-equihash/blob/ad5028798aac0be059a37e6afa8b6071544a6aa4/db.cpp#L230 - here. Also, don't forget to change `NUM_COINS` if you plan to add more than one coin.
 
-- Are any build instructions for Debian 10 Buster?
+- Any build instructions for Debian 10 Buster?
 
     Yes, thx to @ca333 and @ComputerGenie:
 
@@ -57,7 +57,7 @@ Currently app is in developement state (!), it able to receive `getblocktemplate
     - `git pull`
     - rebuild and restart `stratum`
 
-    `msvc` branch already contains some fixes and can be build unders Windows (with MSVC) and under Linux (with gcc). So, if you have crash with gcc-8, just try `msvc` branch instead of `master`. This is temporary solution till all needed fixes will be merged in `master` branch.
+    `msvc` branch already contains some fixes and can be build under Windows (with MSVC) and under Linux (with gcc). So, if you have crash with gcc-8, just try `msvc` branch instead of `master`. This is temporary solution till all needed fixes will be merged in `master` branch.
 
 ### Other
 
