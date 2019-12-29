@@ -277,8 +277,10 @@ void coind_terminate(YAAMP_COIND *coind)
 //	coind_terminate(coind);
 //}
 
+YAAMP_COIND::YAAMP_COIND()
+{
+}
 
-
-
-
-
+YAAMP_COIND::~YAAMP_COIND()
+{
+}

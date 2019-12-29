@@ -191,8 +191,11 @@ bool client_reset_multialgo(YAAMP_CLIENT *client, bool first)
 		if(p < 0.02) return false;
 		if(e*p < 100) return false;
 	}
-
+#ifndef WIN32
 	shutdown(client->sock->sock, SHUT_RDWR);
+#else
+	shutdown(client->sock->sock, SD_BOTH);
+#endif
 	return true;
 }
 
@@ -297,7 +300,9 @@ int hostname_to_ip(const char *hostname , char* ip)
     if ( (he = gethostbyname( hostname ) ) == NULL)
     {
         // get the host info
-        herror("gethostbyname");
+#ifndef WIN32
+		herror("gethostbyname");
+#endif // !WIN32
         return 1;
     }
 
@@ -316,27 +321,30 @@ int hostname_to_ip(const char *hostname , char* ip)
 bool client_find_my_ip(const char *name)
 {
 //	return false;
+#ifndef WIN32
 	char ip[1024] = "";
 
 	hostname_to_ip(name, ip);
-	if(!ip[0]) return false;
+	if (!ip[0]) return false;
 
 	char host[NI_MAXHOST];
-	for(struct ifaddrs *ifa = g_ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+	for (struct ifaddrs* ifa = g_ifaddr; ifa != NULL; ifa = ifa->ifa_next)
 	{
-		if(ifa->ifa_addr == NULL) continue;
+		if (ifa->ifa_addr == NULL) continue;
 		host[0] = 0;
 
 		getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
-		if(!host[0]) continue;
+		if (!host[0]) continue;
 
-		if(!strcmp(host, ip))
+		if (!strcmp(host, ip))
 		{
 			debuglog("found my ip %s\n", ip);
 			return true;
 		}
 	}
 
+	
+#endif // !WIN32
 	return false;
 }
 

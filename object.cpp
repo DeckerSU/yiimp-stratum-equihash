@@ -97,7 +97,5 @@ void object_prune_debug(CommonList *list, YAAMP_OBJECT_DELETE_FUNC deletefunc)
 	list->Leave();
 }
 
-
-
-
-
+YAAMP_OBJECT::YAAMP_OBJECT() {}
+YAAMP_OBJECT::~YAAMP_OBJECT() {}

@@ -1,7 +1,14 @@
 
 #include "stratum.h"
 #include <signal.h>
+#ifndef WIN32
 #include <sys/resource.h>
+#else
+#include <windows.h>
+#include <stdint.h>
+#endif // !WIN32
+
+
 
 CommonList g_list_coind;
 CommonList g_list_client;
@@ -74,6 +81,7 @@ void *monitor_thread(void *p);
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
+#ifndef WIN32
 static void scrypt_hash(const char* input, char* output, uint32_t len)
 {
 	scrypt_1024_1_1_256((unsigned char *)input, (unsigned char *)output);
@@ -107,11 +115,12 @@ static void neoscrypt_hash(const char* input, char* output, uint32_t len)
 {
 	neoscrypt((unsigned char *)input, (unsigned char *)output, 0x80000620);
 }
+#endif
 
 YAAMP_ALGO g_algos[] =
 {
 	{"equihash", equi_hash, 1, 0, 0}, 
-
+#ifndef WIN32
 	{"sha256", sha256_double_hash, 1, 0, 0},
 	{"scrypt", scrypt_hash, 0x10000, 0, 0},
 	{"scryptn", scryptn_hash, 0x10000, 0, 0},
@@ -169,7 +178,7 @@ YAAMP_ALGO g_algos[] =
 	{"keccak", keccak256_hash, 0x80, 0, sha256_hash_hex },
 	{"keccakc", keccak256_hash, 0x100, 0, 0},
 	{"hex", hex_hash, 0x100, 0, sha256_hash_hex },
-	
+
 	{"phi", phi_hash, 1, 0, 0},
 	{"phi2", phi2_hash, 0x100, 0, 0},
 
@@ -207,7 +216,7 @@ YAAMP_ALGO g_algos[] =
 	{"whirlcoin", whirlpool_hash, 1, 0, sha256_hash_hex }, /* old sha merkleroot */
 	{"whirlpool", whirlpool_hash, 1, 0 }, /* sha256d merkleroot */
 	{"whirlpoolx", whirlpoolx_hash, 1, 0, 0},
-
+#endif // !WIN32
 	{"", NULL, 0, 0},
 };
 
@@ -232,8 +241,22 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	#ifdef WIN32
+	WSADATA wsaData;
+	int iResult;
+	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	if (iResult != 0) {
+		printf("WSAStartup failed: %d\n", iResult);
+		return 1;
+	}
+	#endif // WIN32
+
 	srand(time(NULL));
+	#ifndef WIN32
 	getifaddrs(&g_ifaddr);
+	#else
+	// TODO: getifaddrs windows implementation
+	#endif // !WIN32
 
 	initlog(argv[1]);
 
@@ -300,8 +323,10 @@ int main(int argc, char **argv)
 //	struct rlimit rlim_files = {0x10000, 0x10000};
 //	setrlimit(RLIMIT_NOFILE, &rlim_files);
 
+	#ifndef WIN32
 	struct rlimit rlim_threads = {0x8000, 0x8000};
 	setrlimit(RLIMIT_NPROC, &rlim_threads);
+	#endif // !WIN32
 
 	stratumlogdate("starting stratum for %s on %s:%d\n",
 		g_current_algo->name, g_tcp_server, g_tcp_port);
@@ -358,7 +383,7 @@ int main(int argc, char **argv)
 			db_update_remotes(db);
 		}
 
-		share_write(db);
+		share_write(db); // somehow leads to stack corruption with MSVC build, TODO: investigate later
 		share_prune(db);
 
 		block_prune(db);
@@ -429,11 +454,19 @@ void *monitor_thread(void *p)
 
 void *stratum_thread(void *p)
 {
+	//std::cerr << "Stratum thread started ..." << std::endl;
+
 	int listen_sock = socket(AF_INET, SOCK_STREAM, 0);
 	if(listen_sock <= 0) yaamp_error("socket");
 
-	int optval = 1;
-	setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
+	
+	#ifndef WIN32
+		int optval = 1;
+		setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
+	#else
+		int optval = 1;
+		setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, (const char*)(&optval), sizeof(optval));
+	#endif
 
 	struct sockaddr_in serv;
 
@@ -473,7 +506,12 @@ void *stratum_thread(void *p)
 		if(res != 0)
 		{
 			int error = errno;
+			#ifndef WIN32
 			close(sock);
+			#else
+			closesocket(sock);
+			#endif
+
 			g_exiting = true;
 			stratumlog("%s pthread_create error %d %d\n", g_stratum_algo, res, error);
 		}

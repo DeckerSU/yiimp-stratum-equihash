@@ -77,6 +77,7 @@ int test_merkle()
 	string mr = merkle_with_first(res, "d43b669fb42cfa84695b844c0402d410213faa4f3e66cb7248f688ff19d5e5f7");
 
 	printf("mr: %s\n", mr.c_str());		// 82293f182d5db07d08acf334a5a907012bbb9990851557ac0ec028116081bd5a
+	return 0;
 
 }
 

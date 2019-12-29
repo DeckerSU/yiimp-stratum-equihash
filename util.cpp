@@ -791,6 +791,19 @@ uint64_t htoi64(const char *s)
     return val;
 }
 
+#ifdef WIN32
+// https://stackoverflow.com/questions/5404277/porting-clock-gettime-to-windows
+int clock_gettime(int, struct timespec* spec)      //C-file part
+{
+	__int64 wintime; GetSystemTimeAsFileTime((FILETIME*)&wintime);
+	wintime -= 116444736000000000i64;  //1jan1601 to 1jan1970
+	spec->tv_sec = wintime / 10000000i64;           //seconds
+	spec->tv_nsec = wintime % 10000000i64 * 100;      //nano-seconds
+	return 0;
+}
+#define CLOCK_REALTIME 0
+#endif
+
 #if 0
 // gettimeofday seems deprecated in POSIX
 long long current_timestamp()
@@ -830,23 +843,28 @@ long long current_timestamp_dms() // allow 0.1 ms time
 int opened_files()
 {
 	int fds = 0;
-	DIR *d = opendir("/proc/self/fd");
+#ifndef WIN32
+	DIR* d = opendir("/proc/self/fd");
 	if (d) {
 		while (readdir(d)) fds++;
 		closedir(d);
 	}
+#endif // !WIN32
 	return fds;
 }
 
 int resident_size()
 {
 	int sz, res = 0;
-	FILE *fp = fopen("/proc/self/statm", "r");
+#ifndef WIN32
+	FILE* fp = fopen("/proc/self/statm", "r");
 	if (fp) {
 		int p = fscanf(fp, "%d", &sz);
 		if (p) p += fscanf(fp, "%d", &res);
 		fclose(fp);
 	}
+
+#endif // !WIN32
 	return res;
 }
 

@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{036A2732-5478-43F9-BECA-87AAABAE8A37}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir)compat\include;$(ProjectDir)compat;$(ProjectDir);$(ProjectDir)\iniparser\src;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)compat\libs\pthread;$(ProjectDir)compat\libs\libsodium\x64\Debug\v142\dynamic;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)compat\include;$(ProjectDir)compat;$(ProjectDir);$(ProjectDir)\iniparser\src;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)compat\libs\pthread;$(ProjectDir)compat\libs\libsodium\x64\Release\v142\dynamic;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;NO_EXCHANGE;NO_MYSQL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;NO_EXCHANGE;NO_MYSQL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;NO_EXCHANGE;NO_MYSQL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Ws2_32.Lib;libsodium.lib;pthreadVC2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_CONSOLE;NO_EXCHANGE;NO_MYSQL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Ws2_32.Lib;libsodium.lib;pthreadVC2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="algos\endian.cpp" />
+    <ClCompile Include="algos\equi.cpp" />
+    <ClCompile Include="algos\sha256.cpp" />
+    <ClCompile Include="base58.cpp" />
+    <ClCompile Include="client.cpp" />
+    <ClCompile Include="client_core.cpp" />
+    <ClCompile Include="client_difficulty.cpp" />
+    <ClCompile Include="client_submit.cpp" />
+    <ClCompile Include="coinbase.cpp" />
+    <ClCompile Include="coind.cpp" />
+    <ClCompile Include="coind_aux.cpp" />
+    <ClCompile Include="coind_submit.cpp" />
+    <ClCompile Include="coind_template.cpp" />
+    <ClCompile Include="compat\compat.cpp" />
+    <ClCompile Include="db.cpp" />
+    <ClCompile Include="iniparser\src\dictionary.c" />
+    <ClCompile Include="iniparser\src\iniparser.c" />
+    <ClCompile Include="job.cpp" />
+    <ClCompile Include="job_core.cpp" />
+    <ClCompile Include="job_send.cpp" />
+    <ClCompile Include="json.cpp" />
+    <ClCompile Include="list.cpp" />
+    <ClCompile Include="merkle.cpp" />
+    <ClCompile Include="object.cpp" />
+    <ClCompile Include="remote.cpp" />
+    <ClCompile Include="remote_template.cpp" />
+    <ClCompile Include="rpc.cpp" />
+    <ClCompile Include="rpc_curl.cpp" />
+    <ClCompile Include="share.cpp" />
+    <ClCompile Include="socket.cpp" />
+    <ClCompile Include="stratum.cpp" />
+    <ClCompile Include="user.cpp" />
+    <ClCompile Include="util.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="algos\a5a.h" />
+    <ClInclude Include="algos\a5amath.h" />
+    <ClInclude Include="algos\aergo.h" />
+    <ClInclude Include="algos\allium.h" />
+    <ClInclude Include="algos\ar2\ar2-scrypt-jane.h" />
+    <ClInclude Include="algos\ar2\argon2.h" />
+    <ClInclude Include="algos\ar2\core.h" />
+    <ClInclude Include="algos\ar2\encoding.h" />
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-hash.h" />
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-hash_skein512.h" />
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-mix_salsa64-avx.h" />
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-mix_salsa64-avx2.h" />
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-mix_salsa64-sse2.h" />
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-mix_salsa64-ssse3.h" />
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-mix_salsa64-xop.h" />
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-mix_salsa64.h" />
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-pbkdf2.h" />
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-portable-x86.h" />
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-portable.h" />
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-romix-basic.h" />
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-romix-template.h" />
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-romix.h" />
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-salsa64.h" />
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-test-vectors.h" />
+    <ClInclude Include="algos\ar2\thread.h" />
+    <ClInclude Include="algos\argon2a.h" />
+    <ClInclude Include="algos\argon2d-dyn.h" />
+    <ClInclude Include="algos\bastion.h" />
+    <ClInclude Include="algos\bitcore.h" />
+    <ClInclude Include="algos\blake.h" />
+    <ClInclude Include="algos\blake2b.h" />
+    <ClInclude Include="algos\blake2s.h" />
+    <ClInclude Include="algos\blake2\blake2-impl.h" />
+    <ClInclude Include="algos\blake2\blake2.h" />
+    <ClInclude Include="algos\blake2\blamka-round-opt.h" />
+    <ClInclude Include="algos\blake2\blamka-round-ref.h" />
+    <ClInclude Include="algos\blakecoin.h" />
+    <ClInclude Include="algos\bmw.h" />
+    <ClInclude Include="algos\c11.h" />
+    <ClInclude Include="algos\common.h" />
+    <ClInclude Include="algos\deep.h" />
+    <ClInclude Include="algos\drop.h" />
+    <ClInclude Include="algos\endian.h" />
+    <ClInclude Include="algos\equi.h" />
+    <ClInclude Include="algos\exosis.h" />
+    <ClInclude Include="algos\fresh.h" />
+    <ClInclude Include="algos\gost.h" />
+    <ClInclude Include="algos\groestl.h" />
+    <ClInclude Include="algos\hex.h" />
+    <ClInclude Include="algos\hive.h" />
+    <ClInclude Include="algos\hmq17.h" />
+    <ClInclude Include="algos\hsr14.h" />
+    <ClInclude Include="algos\jha.h" />
+    <ClInclude Include="algos\keccak.h" />
+    <ClInclude Include="algos\lbk3.h" />
+    <ClInclude Include="algos\lbry.h" />
+    <ClInclude Include="algos\luffa.h" />
+    <ClInclude Include="algos\Lyra2-z.h" />
+    <ClInclude Include="algos\Lyra2-zz.h" />
+    <ClInclude Include="algos\Lyra2.h" />
+    <ClInclude Include="algos\lyra2re.h" />
+    <ClInclude Include="algos\lyra2v2.h" />
+    <ClInclude Include="algos\lyra2v3.h" />
+    <ClInclude Include="algos\lyra2z.h" />
+    <ClInclude Include="algos\lyra2zz.h" />
+    <ClInclude Include="algos\m7m.h" />
+    <ClInclude Include="algos\magimath.h" />
+    <ClInclude Include="algos\neoscrypt.h" />
+    <ClInclude Include="algos\nist5.h" />
+    <ClInclude Include="algos\pentablake.h" />
+    <ClInclude Include="algos\phi.h" />
+    <ClInclude Include="algos\phi2.h" />
+    <ClInclude Include="algos\polytimos.h" />
+    <ClInclude Include="algos\pomelo.h" />
+    <ClInclude Include="algos\quark.h" />
+    <ClInclude Include="algos\qubit.h" />
+    <ClInclude Include="algos\rainforest.h" />
+    <ClInclude Include="algos\scryptn.h" />
+    <ClInclude Include="algos\sha256.h" />
+    <ClInclude Include="algos\sha256q.h" />
+    <ClInclude Include="algos\sha256t.h" />
+    <ClInclude Include="algos\sha256_Y.h" />
+    <ClInclude Include="algos\sib.h" />
+    <ClInclude Include="algos\skein.h" />
+    <ClInclude Include="algos\skein2.h" />
+    <ClInclude Include="algos\skunk.h" />
+    <ClInclude Include="algos\sm3.h" />
+    <ClInclude Include="algos\sonoa.h" />
+    <ClInclude Include="algos\Sponge.h" />
+    <ClInclude Include="algos\swifftx\inttypes.h" />
+    <ClInclude Include="algos\swifftx\stdbool.h" />
+    <ClInclude Include="algos\swifftx\stdint.h" />
+    <ClInclude Include="algos\swifftx\SWIFFTX.h" />
+    <ClInclude Include="algos\sysendian.h" />
+    <ClInclude Include="algos\timetravel.h" />
+    <ClInclude Include="algos\tribus.h" />
+    <ClInclude Include="algos\veltor.h" />
+    <ClInclude Include="algos\velvet.h" />
+    <ClInclude Include="algos\vitalium.h" />
+    <ClInclude Include="algos\whirlpool.h" />
+    <ClInclude Include="algos\whirlpoolx.h" />
+    <ClInclude Include="algos\x11.h" />
+    <ClInclude Include="algos\x11evo.h" />
+    <ClInclude Include="algos\x12.h" />
+    <ClInclude Include="algos\x13.h" />
+    <ClInclude Include="algos\x14.h" />
+    <ClInclude Include="algos\x15.h" />
+    <ClInclude Include="algos\x16r.h" />
+    <ClInclude Include="algos\x16rv2.h" />
+    <ClInclude Include="algos\x16s.h" />
+    <ClInclude Include="algos\x17.h" />
+    <ClInclude Include="algos\x22i.h" />
+    <ClInclude Include="algos\xevan.h" />
+    <ClInclude Include="algos\yescrypt.h" />
+    <ClInclude Include="algos\zr5.h" />
+    <ClInclude Include="client.h" />
+    <ClInclude Include="coind.h" />
+    <ClInclude Include="compat\include\compat.h" />
+    <ClInclude Include="db.h" />
+    <ClInclude Include="iniparser\src\dictionary.h" />
+    <ClInclude Include="iniparser\src\iniparser.h" />
+    <ClInclude Include="job.h" />
+    <ClInclude Include="json.h" />
+    <ClInclude Include="object.h" />
+    <ClInclude Include="remote.h" />
+    <ClInclude Include="rpc.h" />
+    <ClInclude Include="sha3\blake2b.h" />
+    <ClInclude Include="sha3\blake2s.h" />
+    <ClInclude Include="sha3\sph_blake.h" />
+    <ClInclude Include="sha3\sph_bmw.h" />
+    <ClInclude Include="sha3\sph_cubehash.h" />
+    <ClInclude Include="sha3\sph_echo.h" />
+    <ClInclude Include="sha3\sph_fugue.h" />
+    <ClInclude Include="sha3\sph_groestl.h" />
+    <ClInclude Include="sha3\sph_hamsi.h" />
+    <ClInclude Include="sha3\sph_haval.h" />
+    <ClInclude Include="sha3\sph_hefty1.h" />
+    <ClInclude Include="sha3\sph_jh.h" />
+    <ClInclude Include="sha3\sph_keccak.h" />
+    <ClInclude Include="sha3\sph_luffa.h" />
+    <ClInclude Include="sha3\sph_ripemd.h" />
+    <ClInclude Include="sha3\sph_sha2.h" />
+    <ClInclude Include="sha3\sph_shabal.h" />
+    <ClInclude Include="sha3\sph_shavite.h" />
+    <ClInclude Include="sha3\sph_simd.h" />
+    <ClInclude Include="sha3\sph_skein.h" />
+    <ClInclude Include="sha3\sph_tiger.h" />
+    <ClInclude Include="sha3\sph_types.h" />
+    <ClInclude Include="sha3\sph_whirlpool.h" />
+    <ClInclude Include="share.h" />
+    <ClInclude Include="socket.h" />
+    <ClInclude Include="stratum-common.h" />
+    <ClInclude Include="stratum.h" />
+    <ClInclude Include="util.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="iniparser\html\globals_func.html" />
+    <None Include="iniparser\html\index.html" />
+    <None Include="iniparser\html\iniparser_8h.html" />
+    <None Include="iniparser\html\iniparser_8main.html" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -8,6 +8,7 @@ bool socket_connected(YAAMP_SOCKET *s)
 
 void socket_real_ip(YAAMP_SOCKET *s)
 {
+#ifndef WIN32
 	// get real ip if we are using haproxy or similar that use PROXY protocol
 	// https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt
 	int size, ret;
@@ -33,7 +34,9 @@ void socket_real_ip(YAAMP_SOCKET *s)
 		} while (ret == -1 && errno == EINTR);
 		return;
 	}
-	else {
+	else 
+#endif // !WIN32	
+	{
 		// not received any proxy header
 		struct sockaddr_in name;
 		socklen_t len = sizeof(name);
@@ -59,7 +62,14 @@ YAAMP_SOCKET *socket_initialize(int sock)
 	s->buflen = 0;
 	s->sock = sock;
 
+	#ifndef WIN32
 	setsockopt(s->sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+	#else
+	// https://www.opennet.ru/man.shtml?topic=select&category=2&russian=0 // tv_usec - microseconds
+	// https://docs.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-setsockopt
+	int optval = g_socket_recv_timeout * 1000; 
+	setsockopt(s->sock, SOL_SOCKET, SO_RCVTIMEO, (const char*)(&optval), sizeof(optval));
+	#endif
 
 //	yaamp_create_mutex(&s->mutex);
 //	pthread_mutex_lock(&s->mutex);
@@ -88,7 +98,11 @@ void socket_close(YAAMP_SOCKET *s)
 	}
 
 	if(!s) return;
+	#ifndef WIN32
 	if(s->sock) close(s->sock);
+	#else
+	if (s->sock) closesocket(s->sock);
+	#endif
 
 //	pthread_mutex_unlock(&s->mutex);
 //	pthread_mutex_destroy(&s->mutex);
@@ -193,7 +207,11 @@ int socket_send_raw(YAAMP_SOCKET *s, const char *buffer, int size)
 		debuglog("socket send: %s", buffer);
 	}
 
+	#ifndef WIN32
 	int res = send(s->sock, buffer, size, MSG_NOSIGNAL);
+	#else
+	int res = send(s->sock, buffer, size, 0);
+	#endif
 	return res;
 }
 

@@ -1,5 +1,6 @@
 
 #include "stratum.h"
+#include "share.h"
 
 //void check_job(YAAMP_JOB *job)
 //{
@@ -114,13 +115,23 @@ YAAMP_SHARE *share_find(int jobid, char *extranonce2, char *ntime, char *nonce, 
 	return NULL;
 }
 
+#ifdef WIN32
+#ifdef _MSC_VER
+#include <process.h>
+#define getpid() _getpid()
+#endif
+#endif
+
 void share_write(YAAMP_DB *db)
 {
+
 	int pid = getpid();
 	int count = 0;
 	int now = time(NULL);
-
-	char buffer[1024*1024] = "insert into shares (userid, workerid, coinid, jobid, pid, valid, extranonce1, difficulty, share_diff, time, algo, error) values ";
+	// buffer[1024*1024] - too big (!) to fit in stack when compile with MSCV, should use heap here instead.
+	// char buffer[1024*1024] = "insert into shares (userid, workerid, coinid, jobid, pid, valid, extranonce1, difficulty, share_diff, time, algo, error) values ";
+	char* buffer = (char*)malloc(1024 * 1024 * sizeof(char));
+	strcpy(buffer, "insert into shares (userid, workerid, coinid, jobid, pid, valid, extranonce1, difficulty, share_diff, time, algo, error) values ");
 	g_list_worker.Enter();
 
 	for(CLI li = g_list_worker.first; li; li = li->next)
@@ -156,6 +167,7 @@ void share_write(YAAMP_DB *db)
 
 	g_list_worker.Leave();
 	if(count) db_query(db, buffer);
+	free(buffer);
 }
 
 void share_prune(YAAMP_DB *db)
@@ -351,4 +363,26 @@ void submit_prune(YAAMP_DB *db)
 	if(count) db_query(db, buffer);
 }
 
+YAAMP_WORKER::YAAMP_WORKER()
+{
+}
 
+YAAMP_WORKER::~YAAMP_WORKER()
+{
+}
+
+YAAMP_SHARE::YAAMP_SHARE()
+{
+}
+
+YAAMP_SHARE::~YAAMP_SHARE()
+{
+}
+
+YAAMP_SUBMIT::YAAMP_SUBMIT()
+{
+}
+
+YAAMP_SUBMIT::~YAAMP_SUBMIT()
+{
+}

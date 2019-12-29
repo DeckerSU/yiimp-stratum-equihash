@@ -14,6 +14,27 @@ bool rpc_connect(YAAMP_RPC *rpc)
 	if(g_exiting) return false;
 
 	struct hostent *ent = gethostbyname(rpc->host);
+#ifdef WIN32
+	if (ent == NULL) {
+		DWORD dwError;
+		dwError = WSAGetLastError();
+		if (dwError != 0) {
+			if (dwError == WSAHOST_NOT_FOUND) {
+				printf("Host not found\n");
+				return 1;
+			}
+			else if (dwError == WSANO_DATA) {
+				printf("No data record found\n");
+				return 1;
+			}
+			else {
+				printf("Function failed with error: %ld\n", dwError);
+				return 1;
+			}
+		}
+	}
+#endif // WIN32
+
 	if(!ent) return false;
 
 	struct sockaddr_in serv;
@@ -21,7 +42,11 @@ bool rpc_connect(YAAMP_RPC *rpc)
 	serv.sin_family = AF_INET;
 	serv.sin_port = htons(rpc->port);
 
+#ifndef WIN32
 	bcopy((char *)ent->h_addr, (char *)&serv.sin_addr.s_addr, ent->h_length);
+#else
+	memcpy((char*)&serv.sin_addr.s_addr, (char*)ent->h_addr, ent->h_length);
+#endif
 
 	rpc->sock = socket(AF_INET, SOCK_STREAM, 0);
 	if(rpc->sock <= 0) return false;
@@ -48,8 +73,12 @@ void rpc_close(YAAMP_RPC *rpc)
 {
 	if(!rpc_connected(rpc)) return;
 	pthread_mutex_destroy(&rpc->mutex);
-
+#ifndef WIN32
 	close(rpc->sock);
+#else
+	closesocket(rpc->sock);
+#endif // !WIN32
+	
 	rpc->sock = 0;
 
 	if (g_debuglog_rpc) {
@@ -63,7 +92,11 @@ int rpc_send_raw(YAAMP_RPC *rpc, const char *buffer, int bytes)
 {
 	if(!rpc_connected(rpc)) return -1;
 
+#ifndef WIN32
 	int res = send(rpc->sock, buffer, bytes, MSG_NOSIGNAL);
+#else
+	int res = send(rpc->sock, buffer, bytes, 0);
+#endif
 	if(res <= 0) return res;
 
 	if (g_debuglog_rpc) {
@@ -77,7 +110,13 @@ int rpc_flush_soft(YAAMP_RPC *rpc)
 {
 	if(!rpc_connected(rpc)) return -1;
 
+#ifndef WIN32
 	int res = send(rpc->sock, rpc->buffer, rpc->bufpos, MSG_MORE);
+#else
+	int res = send(rpc->sock, rpc->buffer, rpc->bufpos, 0);
+#endif // !WIN32
+
+	
 	rpc->bufpos = 0;
 
 	return res;
@@ -290,6 +329,7 @@ json_value *rpc_call(YAAMP_RPC *rpc, char const *method, char const *params)
 	return json;
 }
 
-
-
-
+#ifdef WIN32
+YAAMP_RPC::YAAMP_RPC() {}
+YAAMP_RPC::~YAAMP_RPC() {}
+#endif

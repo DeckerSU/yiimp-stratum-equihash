@@ -154,8 +154,10 @@ retry:
 	if(!gw || json_is_null(gw)) {
 		usleep(500*YAAMP_MS); // too much connections ? no data received
 		if (--retry_cnt > 0) {
+#ifdef HAVE_CURL
 			if (coind->rpc.curl)
 				rpc_curl_get_lasterr(rpc_error, 1023);
+#endif
 			debuglog("%s getwork retry %d\n", coind->symbol, GETWORK_RETRY_MAX-retry_cnt);
 			goto retry;
 		}
@@ -322,7 +324,7 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 
         const char *target = json_get_string(json_result, "target");
         uint32_t bits_bin = target2bits(target); // bits_bin = 0x1e3a79c3, templ->nbits = "1e3a79c3"
-        char bits_str[5] = {0};
+        char bits_str[33] = {0}; memset(bits_str, 0, sizeof(bits_str));
         hexlify(bits_str, (const unsigned char *)&bits_bin, 4);
         string_be(bits_str, templ->nbits_from_target);
 
@@ -684,7 +686,7 @@ bool coind_create_job(YAAMP_COIND *coind, bool force)
     if (g_current_algo->name && !strcmp(g_current_algo->name,"equihash"))
         {
             uint32_t bits;
-            char bits_str[5] = { 0 }; 
+			char bits_str[33] = { 0 }; memset(bits_str, 0, sizeof(bits_str));
             string_be(templ->nbits, bits_str); binlify((unsigned char *)&bits, bits_str);
             coin_target = diff_to_target(nbits_to_diff_equi(&bits));
         }

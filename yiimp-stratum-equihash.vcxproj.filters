@@ -1,0 +1,588 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="base58.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="client_core.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="client_difficulty.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="client_submit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="coinbase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="coind.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="coind_aux.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="coind_submit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="coind_template.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="db.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="job.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="job_core.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="job_send.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="json.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="list.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="merkle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="remote.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="remote_template.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rpc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rpc_curl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="share.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="socket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stratum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="user.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="iniparser\src\dictionary.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="iniparser\src\iniparser.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="algos\equi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="algos\endian.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="algos\sha256.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="compat\compat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="client.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="coind.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="db.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="job.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="json.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="remote.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rpc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="share.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="socket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stratum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\a5a.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\a5amath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\aergo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\allium.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\argon2a.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\argon2d-dyn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\bastion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\bitcore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\blake.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\blake2b.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\blake2s.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\blakecoin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\bmw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\c11.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\deep.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\drop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\endian.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\equi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\exosis.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\fresh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\gost.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\groestl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\hex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\hive.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\hmq17.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\hsr14.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\jha.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\keccak.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\lbk3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\lbry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\luffa.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\Lyra2-z.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\Lyra2-zz.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\Lyra2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\lyra2re.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\lyra2v2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\lyra2v3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\lyra2z.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\lyra2zz.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\m7m.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\magimath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\neoscrypt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\nist5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\pentablake.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\phi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\phi2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\polytimos.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\pomelo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\quark.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\qubit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\rainforest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\scryptn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\sha256.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\sha256q.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\sha256t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\sha256_Y.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\sib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\skein.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\skein2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\skunk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\sm3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\sonoa.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\Sponge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\sysendian.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\timetravel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\tribus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\veltor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\velvet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\vitalium.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\whirlpool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\whirlpoolx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\x11.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\x11evo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\x12.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\x13.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\x14.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\x15.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\x16r.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\x16rv2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\x16s.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\x17.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\x22i.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\xevan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\yescrypt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\zr5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\ar2-scrypt-jane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\argon2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\core.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\encoding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-hash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-hash_skein512.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-mix_salsa64-avx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-mix_salsa64-avx2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-mix_salsa64-sse2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-mix_salsa64-ssse3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-mix_salsa64-xop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-mix_salsa64.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-pbkdf2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-portable-x86.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-portable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-romix-basic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-romix-template.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-romix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-salsa64.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\ar2\sj\scrypt-jane-test-vectors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\blake2\blake2-impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\blake2\blake2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\blake2\blamka-round-opt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\blake2\blamka-round-ref.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\swifftx\inttypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\swifftx\stdbool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\swifftx\stdint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algos\swifftx\SWIFFTX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="iniparser\src\dictionary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="iniparser\src\iniparser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\blake2b.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\blake2s.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_blake.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_bmw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_cubehash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_echo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_fugue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_groestl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_hamsi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_haval.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_hefty1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_jh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_keccak.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_luffa.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_ripemd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_sha2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_shabal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_shavite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_simd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_skein.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_tiger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sha3\sph_whirlpool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stratum-common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="compat\include\compat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="iniparser\html\globals_func.html" />
+    <None Include="iniparser\html\index.html" />
+    <None Include="iniparser\html\iniparser_8h.html" />
+    <None Include="iniparser\html\iniparser_8main.html" />
+  </ItemGroup>
+</Project>

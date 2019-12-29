@@ -144,7 +144,13 @@ void db_add_user(YAAMP_DB *db, YAAMP_CLIENT *client)
 		db_query(db, "UPDATE accounts SET coinsymbol='%s', swap_time=%u, donation=%d, hostaddr='%s' WHERE id=%d AND balance = 0"
 			" AND (SELECT COUNT(id) FROM payouts WHERE account_id=%d AND tx IS NULL) = 0" // failed balance
 			" AND (SELECT pending FROM balanceuser WHERE userid=%d ORDER by time DESC LIMIT 1) = 0" // pending balance
-			, symbol, (uint) time(NULL), gift, client->sock->ip, client->userid, client->userid, client->userid);
+			, symbol, 
+#ifndef WIN32
+			(uint)time(NULL)
+#else
+			time(NULL)
+#endif // WIN32
+			, gift, client->sock->ip, client->userid, client->userid, client->userid);
 		#ifndef NO_MYSQL
         if (mysql_affected_rows(&db->mysql) > 0 && strlen(symbol)) {
 			debuglog("%s: %s coinsymbol set to %s ip %s uid (%d)\n",
@@ -165,6 +171,13 @@ void db_clear_worker(YAAMP_DB *db, YAAMP_CLIENT *client)
 	db_query(db, "DELETE FROM workers WHERE id=%d", client->workerid);
 	client->workerid = 0;
 }
+
+#ifdef WIN32
+#ifdef _MSC_VER
+#include <process.h>
+#define getpid() _getpid()
+#endif
+#endif
 
 void db_add_worker(YAAMP_DB *db, YAAMP_CLIENT *client)
 {
@@ -215,7 +228,12 @@ void db_update_workers(YAAMP_DB *db)
 		if(client->speed < 0.00001)
 		{
 			clientlog(client, "speed %f", client->speed);
+#ifndef WIN32
 			shutdown(client->sock->sock, SHUT_RDWR);
+			#else
+			shutdown(client->sock->sock, SD_BOTH);
+#endif // !WIN32
+
 			db_clear_worker(db, client);
 			object_delete(client);
 			continue;

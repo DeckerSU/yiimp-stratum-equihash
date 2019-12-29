@@ -1,0 +1,7 @@
+#ifndef _STRATUM_COMMON_H
+#define _STRATUM_COMMON_H
+
+#define YAAMP_SMALLBUFSIZE		(32*1024)
+
+#endif // !_STRATUM_COMMON_H
+

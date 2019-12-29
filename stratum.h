@@ -1,10 +1,31 @@
+#ifndef _STRATUM_H
+#define _STRATUM_H
 #include <sys/types.h>
-#include <sys/socket.h>
 #include <sys/time.h>
+#ifndef WIN32
+#include <sys/socket.h>
 #include <sys/resource.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <errmsg.h>
+#include <ifaddrs.h>
+#include <dirent.h>
+#include <mysql.h>
+#else
+#if defined(WIN32) && !defined(_WIN32_WCE) && !defined(__CYGWIN__)
+#if !(defined(_WINSOCKAPI_) || defined(_WINSOCK_H) || defined(__LWIP_OPT_H__))
+/* The check above prevents the winsock2 inclusion if winsock.h already was
+   included, since they can't co-exist without problems */
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#endif
+#endif
+#include <windows.h>
+#include <stdint.h>
+#include "compat.h"
+#endif // !WIN32
+
 #include <errno.h>
 #include <math.h>
 
@@ -15,20 +36,16 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <pthread.h>
-#include <mysql.h>
-#include <errmsg.h>
-#include <ifaddrs.h>
-#include <dirent.h>
-
 #include <iostream>
 #include <vector>
 
-using namespace std;
+//using namespace std;
 
 #include "iniparser/src/iniparser.h"
 
 #include "json.h"
 #include "util.h"
+#include "stratum-common.h"
 
 #define YAAMP_RESTARTDELAY		(24*60*60)
 #define YAAMP_MAXJOBDELAY		(2*60)
@@ -39,14 +56,12 @@ using namespace std;
 
 #define YAAMP_MAXALGOS			32
 
-typedef void (*YAAMP_HASH_FUNCTION)(const char *, char *, uint32_t);
+typedef void (*YAAMP_HASH_FUNCTION)(const char*, char*, uint32_t);
 
 #define YAAMP_SHAREPERSEC		10
 
 #define YAAMP_MINDIFF			0x0000000080000000
 #define YAAMP_MAXDIFF			0x4000000000000000
-
-#define YAAMP_SMALLBUFSIZE		(32*1024)
 
 #define YAAMP_NONCE_SIZE		4
 #define YAAMP_EQUI_NONCE_SIZE	(32 - YAAMP_NONCE_SIZE)
@@ -108,7 +123,7 @@ extern uint64_t g_shares_counter;
 extern bool g_allow_rolltime;
 extern time_t g_last_broadcasted;
 
-extern struct ifaddrs *g_ifaddr;
+extern struct ifaddrs* g_ifaddr;
 
 extern pthread_mutex_t g_db_mutex;
 extern pthread_mutex_t g_nonce1_mutex;
@@ -126,29 +141,36 @@ extern volatile bool g_exiting;
 #include "remote.h"
 #include "share.h"
 
-extern YAAMP_DB *g_db;
+extern YAAMP_DB* g_db;
 extern YAAMP_ALGO g_algos[];
-extern YAAMP_ALGO *g_current_algo;
+extern YAAMP_ALGO* g_current_algo;
 
 extern bool g_autoexchange;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-YAAMP_ALGO *stratum_find_algo(const char *name);
+YAAMP_ALGO* stratum_find_algo(const char* name);
 
 extern "C"
 {
-void sha256_hash(const char *input, char *output, unsigned int len);
-void sha256_double_hash(const char *input, char *output, unsigned int len);
-
-void scrypt_1024_1_1_256(const unsigned char *input, unsigned char *output);
-void scrypt_N_R_1_256(const char* input, char* output, uint32_t N, uint32_t R, uint32_t len);
+#ifndef WIN32
+	void sha256_hash(const char* input, char* output, unsigned int len);
+	void sha256_double_hash(const char* input, char* output, unsigned int len);
+#endif // !WIN32
+	void scrypt_1024_1_1_256(const unsigned char* input, unsigned char* output);
+	void scrypt_N_R_1_256(const char* input, char* output, uint32_t N, uint32_t R, uint32_t len);
 }
 
-void sha256_hash_hex(const char *input, char *output, unsigned int len);
-void sha256_double_hash_hex(const char *input, char *output, unsigned int len);
+#ifdef WIN32
+void sha256_hash(const char* input, char* output, unsigned int len);
+void sha256_double_hash(const char* input, char* output, unsigned int len);
+#endif // WIN32
+
+void sha256_hash_hex(const char* input, char* output, unsigned int len);
+void sha256_double_hash_hex(const char* input, char* output, unsigned int len);
 
 #include "algos/equi.h"
+#ifndef WIN32
 #include "algos/a5a.h"
 #include "algos/c11.h"
 #include "algos/x11.h"
@@ -219,3 +241,5 @@ void sha256_double_hash_hex(const char *input, char *output, unsigned int len);
 #include "algos/hex.h"
 #include "algos/argon2d-dyn.h"
 #include "algos/exosis.h"
+#endif
+#endif // !_STRATUM_H

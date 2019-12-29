@@ -5,3 +5,14 @@
 *.log
 workdir/*
 stratum
+x64/*
+*.ipch
+*.suo
+*.db
+*.opendb
+*.dll
+*.exe
+*.ilk
+*.pdb
+*.exp
+*.lib

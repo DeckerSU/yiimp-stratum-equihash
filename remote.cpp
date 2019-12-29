@@ -78,8 +78,12 @@ bool remote_connect(YAAMP_REMOTE *remote)
 	serv.sin_family = AF_INET;
 	serv.sin_port = htons(remote->port);
 
-	bcopy((char *)ent->h_addr, (char *)&serv.sin_addr.s_addr, ent->h_length);
-
+	#ifndef WIN32
+	bcopy((char*)ent->h_addr, (char*)&serv.sin_addr.s_addr, ent->h_length);
+	#else
+	memcpy((char*)&serv.sin_addr.s_addr, (char*)ent->h_addr, ent->h_length);
+	#endif // !WIN32
+	
 	int res = connect(sock, (struct sockaddr*)&serv, sizeof(serv));
 	if(res < 0)
 	{
@@ -290,6 +294,7 @@ void *remote_thread(void *p)
 
 	job_signal();
 	pthread_exit(NULL);
+	return NULL;
 }
 
 

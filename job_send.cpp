@@ -182,14 +182,27 @@ void job_broadcast(YAAMP_JOB *job)
 
 		client_adjust_difficulty(client);
 
+#ifndef WIN32
 		setsockopt(client->sock->sock, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+#else
+		// https://www.opennet.ru/man.shtml?topic=select&category=2&russian=0 // tv_usec - microseconds
+		// https://docs.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-setsockopt
+		// SO_SNDTIMEO	DWORD	The timeout, in milliseconds, for blocking send calls.
+		int optval = 100; // 100000 microseconds = 100 milliseconds
+		setsockopt(client->sock->sock, SOL_SOCKET, SO_SNDTIMEO, (const char*)(&optval), sizeof(optval));
+		
+#endif // !WIN32
 
 		if (socket_send_raw(client->sock, buffer, strlen(buffer)) == -1) {
 			int err = errno;
 			client->broadcast_timeouts++;
 			// too much timeouts, disconnect him
 			if (client->broadcast_timeouts >= 3) {
+#ifndef WIN32
 				shutdown(client->sock->sock, SHUT_RDWR);
+#else
+				shutdown(client->sock->sock, SD_BOTH);
+#endif // !WIN32
 				clientlog(client, "unable to send job, sock err %d (%d times)", err, client->broadcast_timeouts);
 				if(client->workerid && !client->reconnecting) {
 				//	CommonLock(&g_db_mutex);

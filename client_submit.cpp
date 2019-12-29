@@ -214,8 +214,12 @@ static void client_do_submit(YAAMP_CLIENT *client, YAAMP_JOB *job, YAAMP_JOB_VAL
     uint64_t hash_int, coin_target;
     if (g_current_algo->name && !strcmp(g_current_algo->name,"equihash")) 
         {
-            uint32_t bits; char bits_str[5] = { 0 }; 
-            string_be(templ->nbits/*_from_target*/, bits_str); binlify((unsigned char *)&bits, bits_str);
+            uint32_t bits; char bits_str[9]; // string representation of bits BABADEAD,0 --> 9 bytes
+			memset(bits_str, 0, sizeof(bits_str));
+			// string_be(templ->nbits/*_from_target*/, bits_str); 
+                        string_be(templ->nbits_from_target, bits_str); 
+			// std::cerr << "bits_str[" << strlen(bits_str) << "] = \"" << bits_str << "\"" << std::endl;
+			binlify((unsigned char *)&bits, bits_str);
             hash_int    = diff_to_target(target_to_diff_equi((uint32_t *)submitvalues->hash_bin));
             coin_target = diff_to_target(nbits_to_diff_equi(&bits));
         }
@@ -230,8 +234,13 @@ static void client_do_submit(YAAMP_CLIENT *client, YAAMP_JOB *job, YAAMP_JOB_VAL
 	int block_size = YAAMP_SMALLBUFSIZE;
 	vector<string>::const_iterator i;
 
+	/*
 	for(i = templ->txdata.begin(); i != templ->txdata.end(); ++i)
 		block_size += strlen((*i).c_str());
+	*/
+	for (std::string txdata : templ->txdata) {
+		block_size += txdata.length();
+	}
 
 	char *block_hex = (char *)malloc(block_size);
 	if(!block_hex) return;
@@ -313,8 +322,14 @@ static void client_do_submit(YAAMP_CLIENT *client, YAAMP_JOB *job, YAAMP_JOB_VAL
 		}
         // adding tx data itself
 		vector<string>::const_iterator i;
+		/*
 		for(i = templ->txdata.begin(); i != templ->txdata.end(); ++i)
 			sprintf(block_hex+strlen(block_hex), "%s", (*i).c_str());
+		*/
+		for (std::string txdata : templ->txdata) {
+			sprintf(block_hex + strlen(block_hex), "%s", txdata.c_str());
+		}
+
 
 		// POS coins need a zero byte appended to block, the daemon replaces it with the signature
 		if(coind->pos)
@@ -396,6 +411,7 @@ bool dump_submit_debug(const char *title, YAAMP_CLIENT *client, YAAMP_JOB *job, 
 	debuglog("ERROR %s, %s subs %d, job %x, %s, id %x, %d, %s, %s %s\n",
 		title, client->sock->ip, client->extranonce_subscribe, job? job->id: 0, client->extranonce1,
 		client->extranonce1_id, client->extranonce2size, extranonce2, ntime, nonce);
+	return 0;
 }
 
 void client_submit_error(YAAMP_CLIENT *client, YAAMP_JOB *job, int id, const char *message, char *extranonce2, char *ntime, char *nonce)
@@ -790,14 +806,16 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
         {
         
         uint32_t bits;
-        uint8_t equi_target[32] = { 0 }; char target_str[65]; target_str[64] = 0; char target_str_be[65]; target_str_be[64] = 0;
+        uint8_t equi_target[36]; // 36 due to specific of diff_to_target_equi (!)
+	char target_str[65]; target_str[64] = 0; char target_str_be[65]; target_str_be[64] = 0;
         diff_to_target_equi((uint32_t *)equi_target, client->difficulty_actual);
         hexlify(target_str, equi_target, 32); string_be(target_str, target_str_be);
         if (g_debuglog_hash) {
             debuglog(" blockhash: %s\n", submitvalues.hash_be);
             debuglog("loc target: %s\n", target_str_be);
             
-            uint32_t tmp_bits; char tmp_bits_str[5]; char tmp_target[65];
+            uint32_t tmp_bits; char tmp_bits_str[9]; char tmp_target[65];
+            memset(tmp_bits_str, 0, sizeof(tmp_bits_str));
             string_be(templ->nbits, tmp_bits_str); binlify((unsigned char *)&tmp_bits, tmp_bits_str);
             bits2target(tmp_bits, tmp_target); tmp_target[64] = '\0';
             debuglog("net target: %s\n", tmp_target);
@@ -809,8 +827,9 @@ bool client_submit_equi(YAAMP_CLIENT *client, json_value *json_params)
             debuglog("client diff: %.3f\n", client->difficulty_actual);
         }
         // templ->nbits is just a 32 char string, like "200f0f0f", so to convert it to diff we should convert it to binary value.
-        char bits_str[5] = { 0 }; 
-        string_be(templ->nbits, bits_str); binlify((unsigned char *)&bits, bits_str);
+		char bits_str[9]; memset(bits_str, 0, sizeof(bits_str));
+        string_be(templ->nbits, bits_str); 
+		binlify((unsigned char *)&bits, bits_str);
 
         if (g_debuglog_hash) debuglog("  coin diff: %.3f\n", nbits_to_diff_equi(&bits));
 

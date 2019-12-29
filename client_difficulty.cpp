@@ -87,7 +87,8 @@ int client_send_difficulty(YAAMP_CLIENT *client, double difficulty)
                 // 00000f0f0f0f0f0f0f0000000000000000000000000000000000000000000000 is stratum diff 4351.93 (136)
                 // 00000f0fffffffffffffffffffffffffffffffffffffffffffffffffffffffff is stratum diff 4352 (136)
                 
-                uint8_t equi_target[32] = { 0 };
+		uint8_t equi_target[36]; // 36 due to specific of diff_to_target_equi (!)
+		memset(equi_target, 0, sizeof(equi_target));
                 char target_str[65]; target_str[64] = 0;
                 char target_str_be[65]; target_str_be[64] = 0;
 

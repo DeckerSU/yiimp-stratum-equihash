@@ -238,6 +238,7 @@ void *job_thread(void *p)
 		job_update();
 		pthread_cond_wait(&g_job_cond, &g_job_mutex);
 	}
+	return NULL; 
 }
 
 void job_init()
@@ -341,10 +342,10 @@ void job_update()
 
 }
 
+YAAMP_JOB::YAAMP_JOB()
+{
+}
 
-
-
-
-
-
-
+YAAMP_JOB::~YAAMP_JOB()
+{
+}

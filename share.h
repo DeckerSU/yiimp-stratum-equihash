@@ -1,5 +1,13 @@
+#ifndef _SHARE_H
+#define _SHARE_H
 
-class YAAMP_WORKER: public YAAMP_OBJECT
+#include <iostream>
+using namespace std;
+#include "object.h"
+#include "job.h"
+#include "db.h"
+
+class YAAMP_WORKER : public YAAMP_OBJECT
 {
 public:
 	int userid;
@@ -14,17 +22,11 @@ public:
 	uint32_t ntime;
 	double difficulty;
 	double share_diff; /* submitted hash diff */
+	YAAMP_WORKER();
+	~YAAMP_WORKER();
 };
 
-inline void worker_delete(YAAMP_OBJECT *object)
-{
-	YAAMP_WORKER *worker = (YAAMP_WORKER *)object;
-	delete worker;
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-
-class YAAMP_SHARE: public YAAMP_OBJECT
+class YAAMP_SHARE : public YAAMP_OBJECT
 {
 public:
 	int jobid;
@@ -32,11 +34,21 @@ public:
 	char ntime[32];
 	char nonce[64];
 	char nonce1[64];
+	YAAMP_SHARE();
+	~YAAMP_SHARE();
 };
 
-inline void share_delete(YAAMP_OBJECT *object)
+inline void worker_delete(YAAMP_OBJECT* object)
 {
-	YAAMP_SHARE *share = (YAAMP_SHARE *)object;
+	YAAMP_WORKER* worker = (YAAMP_WORKER*)object;
+	delete worker;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+inline void share_delete(YAAMP_OBJECT* object)
+{
+	YAAMP_SHARE* share = (YAAMP_SHARE*)object;
 	delete share;
 }
 
@@ -45,15 +57,15 @@ inline void share_delete(YAAMP_OBJECT *object)
 
 ///////////
 
-YAAMP_SHARE *share_find(int jobid, char *extranonce2, char *ntime, char *nonce, char *nonce1);
-void share_add(YAAMP_CLIENT *client, YAAMP_JOB *job, bool valid, char *extranonce2, char *ntime, char *nonce, double share_diff, int error_number);
+YAAMP_SHARE* share_find(int jobid, char* extranonce2, char* ntime, char* nonce, char* nonce1);
+void share_add(YAAMP_CLIENT* client, YAAMP_JOB* job, bool valid, char* extranonce2, char* ntime, char* nonce, double share_diff, int error_number);
 
-void share_write(YAAMP_DB *db);
-void share_prune(YAAMP_DB *db);
+void share_write(YAAMP_DB* db);
+void share_prune(YAAMP_DB* db);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class YAAMP_BLOCK: public YAAMP_OBJECT
+class YAAMP_BLOCK : public YAAMP_OBJECT
 {
 public:
 	time_t created;
@@ -73,15 +85,15 @@ public:
 	char hash2[1024];
 };
 
-inline void block_delete(YAAMP_OBJECT *object)
+inline void block_delete(YAAMP_OBJECT* object)
 {
-	YAAMP_BLOCK *block = (YAAMP_BLOCK *)object;
+	YAAMP_BLOCK* block = (YAAMP_BLOCK*)object;
 	delete block;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-class YAAMP_SUBMIT: public YAAMP_OBJECT
+class YAAMP_SUBMIT : public YAAMP_OBJECT
 {
 public:
 	time_t created;
@@ -89,22 +101,26 @@ public:
 
 	int remoteid;
 	double difficulty;
+	YAAMP_SUBMIT();
+	~YAAMP_SUBMIT();
 };
 
-inline void submit_delete(YAAMP_OBJECT *object)
+inline void submit_delete(YAAMP_OBJECT* object)
 {
-	YAAMP_SUBMIT *submit = (YAAMP_SUBMIT *)object;
+	YAAMP_SUBMIT* submit = (YAAMP_SUBMIT*)object;
 	delete submit;
 }
 
-void block_prune(YAAMP_DB *db);
+void block_prune(YAAMP_DB* db);
 
-void block_add(int userid, int workerid, int coinid, int height, double diff, double diff_user, const char *hash1, const char *h2, int segwit);
-bool block_confirm(int coinid, const char *hash);
+void block_add(int userid, int workerid, int coinid, int height, double diff, double diff_user, const char* hash1, const char* h2, int segwit);
+bool block_confirm(int coinid, const char* hash);
 
-YAAMP_SUBMIT *submit_add(int remoteid, double difficulty);
-void submit_prune(YAAMP_DB *db);
-
-
+YAAMP_SUBMIT* submit_add(int remoteid, double difficulty);
+void submit_prune(YAAMP_DB* db);
 
 
+
+
+
+#endif // !_SHARE_H

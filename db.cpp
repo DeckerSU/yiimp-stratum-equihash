@@ -1,6 +1,16 @@
 
 #include "stratum.h"
+#ifndef WIN32
 #include <mysql/mysqld_error.h>
+#else
+#define CR_SERVER_LOST		2013
+#define ER_DUP_ENTRY 1062
+#define CR_SERVER_GONE_ERROR	2006
+#ifdef _MSC_VER
+#include <process.h>
+#define getpid() _getpid()
+#endif
+#endif // WIN32
 #include <signal.h>
 
 void db_reconnect(YAAMP_DB *db)
@@ -229,11 +239,11 @@ void db_update_coinds(YAAMP_DB *db)
     #define NUM_PARAMS 36
     char *coins_data[NUM_COINS][NUM_PARAMS] = {
         {   "1",         // [0] coin id
-            "Stratum",    // [1] name
-            "127.0.0.1", // [2] rpc.host
-            "12124", // [3] rpc.port
-            "user976830345", // [4] rpc.user
-            "passa74c7dc75048f21d26bd45bc9e844a94dd5265f31414f6e6a985d8090608078a6f", // [5] rpc.pass
+            "MORTY",    // [1] name
+            "localhost", // [2] rpc.host
+            "16348", // [3] rpc.port
+            "user1381685943", // [4] rpc.user
+            "passdb5cb56a13ea825be239804af1f4515e27b8870fedaba4d10c57f885431b3a7959", // [5] rpc.pass
             "POW", // [6] rpcencoding / pos
             "RDEpzVM4g2ohN2geRyQiVkD5ufqXWEaYN4", // [7] wallet
             NULL, // [8] reward
@@ -248,7 +258,7 @@ void db_update_coinds(YAAMP_DB *db)
             NULL, // [17] charity_amount (float)
             NULL, // [18] charity_percent (float)
             NULL, // [19] reward_mul (float)
-            "STRATUM", // [20] symbol
+            "MORTY", // [20] symbol
             "0", // [21] isaux
             NULL, // [22] actual_ttf
             NULL, // [23] actual_ttf
@@ -628,7 +638,11 @@ static void _json_str_safe(YAAMP_DB *db, json_value *json, const char *key, size
 		#ifndef NO_MYSQL
 		mysql_real_escape_string(&db->mysql, escaped, str, strlen(str));
 		#else
+#ifndef WIN32
 		mysql_real_escape_string(NULL, escaped, str, strlen(str));
+#else
+		strcpy(escaped, str);
+#endif // !WIN32
 		#endif
 		snprintf(out, maxlen, "%s", escaped);
 		out[maxlen-1] = '\0';

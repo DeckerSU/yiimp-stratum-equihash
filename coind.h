@@ -1,8 +1,13 @@
+#ifndef _COIND_H
+#define _COIND_H
+
+#include "object.h"
+#include "rpc.h"
 
 struct YAAMP_COIND_AUX
 {
-	YAAMP_COIND *coind;
-//	int height;
+	YAAMP_COIND* coind;
+	//	int height;
 
 	int index;
 	int chainid;
@@ -11,7 +16,7 @@ struct YAAMP_COIND_AUX
 	char target[1024];
 };
 
-class YAAMP_COIND: public YAAMP_OBJECT
+class YAAMP_COIND : public YAAMP_OBJECT
 {
 public:
 	bool touch;
@@ -20,11 +25,11 @@ public:
 	YAAMP_RPC rpc;
 	char rpcencoding[32];
 
-//	pthread_t thread;
+	//	pthread_t thread;
 	pthread_mutex_t mutex;
-//	pthread_cond_t cond;
+	//	pthread_cond_t cond;
 
-//	bool closing;
+	//	bool closing;
 
 	char name[1024];
 	char symbol[256];
@@ -74,40 +79,40 @@ public:
 	char commitment[128];
 	char witness_magic[16];
 
-	YAAMP_JOB *job;
-//	YAAMP_JOB_TEMPLATE *templ;
+	YAAMP_JOB* job;
+	//	YAAMP_JOB_TEMPLATE *templ;
+	YAAMP_COIND();
+	~YAAMP_COIND();
 };
 
 //////////////////////////////////////////////////////////////////////////
 
-inline void coind_delete(YAAMP_OBJECT *object)
+inline void coind_delete(YAAMP_OBJECT* object)
 {
-	YAAMP_COIND *coind = (YAAMP_COIND *)object;
+	YAAMP_COIND* coind = (YAAMP_COIND*)object;
 	object_delete(coind->job);
 
-//	if(coind->templ) delete coind->templ;
+	//	if(coind->templ) delete coind->templ;
 	delete coind;
 }
 
-void coind_error(YAAMP_COIND *coind, const char *s);
+void coind_error(YAAMP_COIND* coind, const char* s);
 
-double coind_profitability(YAAMP_COIND *coind);
-double coind_nethash(YAAMP_COIND *coind);
+double coind_profitability(YAAMP_COIND* coind);
+double coind_nethash(YAAMP_COIND* coind);
 
-bool coind_can_mine(YAAMP_COIND *coind, bool isaux=false);
+bool coind_can_mine(YAAMP_COIND* coind, bool isaux = false);
 void coind_sort();
 
-bool coind_submit(YAAMP_COIND *coind, const char *block);
-bool coind_submitgetauxblock(YAAMP_COIND *coind, const char *hash, const char *block);
+bool coind_submit(YAAMP_COIND* coind, const char* block);
+bool coind_submitgetauxblock(YAAMP_COIND* coind, const char* hash, const char* block);
 
-void coind_init(YAAMP_COIND *coind);
-void coind_terminate(YAAMP_COIND *coind);
+void coind_init(YAAMP_COIND* coind);
+void coind_terminate(YAAMP_COIND* coind);
 //void coind_getauxblock(YAAMP_COIND *coind);
 
-bool coind_create_job(YAAMP_COIND *coind, bool force=false);
+bool coind_create_job(YAAMP_COIND* coind, bool force = false);
 
-bool coind_validate_user_address(YAAMP_COIND *coind, char* const address);
+bool coind_validate_user_address(YAAMP_COIND* coind, char* const address);
 
-
-
-
+#endif // !_COIND_H
