@@ -33,6 +33,32 @@ Currently app is in developement state (!), it able to receive `getblocktemplate
 
     https://github.com/DeckerSU/yiimp-stratum-equihash/blob/ad5028798aac0be059a37e6afa8b6071544a6aa4/db.cpp#L230 - here. Also, don't forget to change `NUM_COINS` if you plan to add more than one coin.
 
+- Are any build instructions for Debian 10 Buster?
+
+    Yes, thx to @ca333 and @ComputerGenie:
+
+    ```
+    $ git clone https://github.com/DeckerSU/yiimp-stratum-equihash
+    $ cd yiimp-stratum-equihash/
+    $ make -C iniparser/ -j$(nproc)
+    # apt install default-libmysqlclient-dev
+    $ make -C algos/ -j$(nproc)
+    $ make -C sha3 -j$(nproc)
+    # apt install libnghttp2-dev librtmp-dev libssh2-1 libssh2-1-dev libldap2-dev libidn11-dev libpsl-dev
+    # apt install libkrb5-dev
+    $ make -f Makefile -j$(nproc)
+
+    ```
+
+    **p.s.** If your default compiler is `gcc 8.3.0 (Debian 8.3.0-6)` you possible will get crash of app after share received. In this case you can try to build `msvc` branch. Do:
+
+    - `make clean`
+    - `git checkout msvc`
+    - `git pull`
+    - rebuild and restart `stratum`
+
+    `msvc` branch already contains some fixes and can be build unders Windows (with MSVC) and under Linux (with gcc). So, if you have crash with gcc-8, just try `msvc` branch instead of `master`. This is temporary solution till all needed fixes will be merged in `master` branch.
+
 ### Other
 
 This implementation have two non-documented options, see the line: https://github.com/DeckerSU/yiimp-stratum-equihash/blob/f9e5c48d8e018f4873683883224bfaffad8f50d8/client_submit.cpp#L218
