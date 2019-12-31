@@ -422,6 +422,10 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 
 	vector<string> txhashes;
 	vector<string> txids;
+
+	vector<string> txdata;
+	txdata.reserve(json_tx->u.array.length);
+
 	txhashes.push_back("");
 	txids.push_back("");
 
@@ -456,7 +460,10 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 		}
 
 		const char *d = json_get_string(json_tx->u.array.values[i], "data");
-		templ->txdata.push_back(d);
+		//std::cerr << templ->txdata.data() << templ->txdata.size() << " " << templ->txdata.capacity() << " " << json_tx->u.array.length << std::endl;
+
+		//templ->txdata.push_back(d);
+		txdata.push_back(d);
 
 		// if wanted, we can limit the count of txs to include
 		if (g_limit_txs_per_block && i >= g_limit_txs_per_block-2) {
@@ -464,6 +471,8 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 			templ->has_filtered_txs = true;
 		}
 	}
+
+	templ->txdata = txdata;
     
     // std::cerr << "[1] Txes count: " << templ->txdata.size() << std::endl;
 
