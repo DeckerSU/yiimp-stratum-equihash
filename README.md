@@ -59,6 +59,19 @@ Currently app is in developement state (!), it able to receive `getblocktemplate
 
     `msvc` branch already contains some fixes and can be build under Windows (with MSVC) and under Linux (with gcc). So, if you have crash with gcc-8, just try `msvc` branch instead of `master`. This is temporary solution till all needed fixes will be merged in `master` branch.
 
+- What's the relationship between this stratum diff, z-nomp/s-nomp/k-nomp diff and NiceHash diff?
+
+    It's relatively easy, look on following table:
+
+    | Yiimp Stratum | Nomp           | Nicehash              |
+    | ------------: | -------------: | --------------------: |
+    | 1             | 0.03125 (**1/32**) | 15.058823529 (**256/17**) |
+    | 2176          | 68             | 32768                 |
+    | 4352          | 136            | 65536                 |
+    | 8704          | 272            | 131072                |
+
+
+
 ### Other
 
 This implementation have two non-documented options, see the line: https://github.com/DeckerSU/yiimp-stratum-equihash/blob/f9e5c48d8e018f4873683883224bfaffad8f50d8/client_submit.cpp#L218
