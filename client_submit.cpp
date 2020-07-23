@@ -238,8 +238,10 @@ static void client_do_submit(YAAMP_CLIENT *client, YAAMP_JOB *job, YAAMP_JOB_VAL
 	for(i = templ->txdata.begin(); i != templ->txdata.end(); ++i)
 		block_size += strlen((*i).c_str());
 	*/
-	for (std::string txdata : templ->txdata) {
-		block_size += txdata.length();
+	if (templ->txdata.size() > 0) {
+		for (std::string txdata : templ->txdata) {
+			block_size += txdata.length();
+		}
 	}
 
 	char *block_hex = (char *)malloc(block_size);
@@ -326,10 +328,11 @@ static void client_do_submit(YAAMP_CLIENT *client, YAAMP_JOB *job, YAAMP_JOB_VAL
 		for(i = templ->txdata.begin(); i != templ->txdata.end(); ++i)
 			sprintf(block_hex+strlen(block_hex), "%s", (*i).c_str());
 		*/
-		for (std::string txdata : templ->txdata) {
-			sprintf(block_hex + strlen(block_hex), "%s", txdata.c_str());
+		if (templ->txdata.size() > 0) {
+			for (std::string txdata : templ->txdata) {
+				sprintf(block_hex + strlen(block_hex), "%s", txdata.c_str());
+			}
 		}
-
 
 		// POS coins need a zero byte appended to block, the daemon replaces it with the signature
 		if(coind->pos)
